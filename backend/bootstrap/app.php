@@ -1,0 +1,33 @@
+<?php
+
+use App\Exceptions\ActiveRentalsException;
+use App\Exceptions\CarNotAvailableException;
+use App\Exceptions\ResourceNotFoundException;
+use App\Exceptions\SelfDemotionException;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {})
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (ResourceNotFoundException $e) {
+            return response()->json(['erro' => $e->getMessage()], 404);
+        });
+        $exceptions->render(function (CarNotAvailableException $e) {
+            return response()->json(['erro' => $e->getMessage()], 422);
+        });
+        $exceptions->render(function (ActiveRentalsException $e) {
+            return response()->json(['erro' => $e->getMessage()], 422);
+        });
+        $exceptions->render(function (SelfDemotionException $e) {
+            return response()->json(['erro' => $e->getMessage()], 422);
+        });
+    })
+    ->create();

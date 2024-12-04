@@ -1,0 +1,23 @@
+# Backend
+backend/vendor/
+backend/.env
+backend/.phpunit.result.cache
+backend/storage/logs/*.log
+backend/docker/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.quasar/
+frontend/.env
+frontend/public/icons/
+
+# Misc
+.DS_Store
+.thumbs.db
+.env
+.claude/
+.phpunit.result.cache
+vendor/
+docker/
+sail
