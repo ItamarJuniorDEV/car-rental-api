@@ -1,0 +1,17 @@
+@import './quasar.variables.scss';
+
+* {
+  box-sizing: border-box;
+}
+
+.active-rental-row {
+  background-color: rgba($positive, 0.08) !important;
+}
+
+.q-table thead th {
+  font-weight: 600;
+}
+
+.q-table thead th[tabindex] {
+  cursor: pointer;
+}
