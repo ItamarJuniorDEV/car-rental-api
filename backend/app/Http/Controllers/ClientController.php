@@ -16,7 +16,7 @@ class ClientController extends Controller
         $query = Client::query();
 
         if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->input('name') . '%');
+            $query->where('name', 'like', '%'.$request->input('name').'%');
         }
 
         $clients = $query->paginate(min($request->integer('per_page', 15), 500));
@@ -37,7 +37,7 @@ class ClientController extends Controller
     {
         $client = Client::find($id);
 
-        if (!$client) {
+        if (! $client) {
             return response()->json(['message' => 'Cliente não encontrado.'], 404);
         }
 
@@ -58,6 +58,7 @@ class ClientController extends Controller
             ], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
@@ -66,7 +67,7 @@ class ClientController extends Controller
     {
         $client = Client::find($id);
 
-        if (!$client) {
+        if (! $client) {
             return response()->json(['message' => 'Cliente não encontrado.'], 404);
         }
 
@@ -80,6 +81,7 @@ class ClientController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
@@ -88,7 +90,7 @@ class ClientController extends Controller
     {
         $client = Client::find($id);
 
-        if (!$client) {
+        if (! $client) {
             return response()->json(['message' => 'Cliente não encontrado.'], 404);
         }
 
@@ -102,6 +104,7 @@ class ClientController extends Controller
             return response()->json(['message' => 'Cliente removido com sucesso!']);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }

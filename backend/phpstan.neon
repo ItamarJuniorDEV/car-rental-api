@@ -5,6 +5,3 @@ parameters:
     paths:
         - app/
     level: 5
-    ignoreErrors:
-        - identifier: property.notFound
-          path: app/Http/Resources/

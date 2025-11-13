@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            $user = new User();
+            $user = new User;
             $user->name = $request->input('name');
             $user->email = $request->input('email');
             $user->password = Hash::make($request->input('password'));
@@ -25,6 +25,7 @@ class AuthController extends Controller
             return response()->json(['token' => $user->createToken('auth')->plainTextToken], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
@@ -34,7 +35,7 @@ class AuthController extends Controller
         try {
             $user = User::where('email', $request->input('email'))->first();
 
-            if (!$user || !Hash::check($request->input('password'), $user->password)) {
+            if (! $user || ! Hash::check($request->input('password'), $user->password)) {
                 throw ValidationException::withMessages(['email' => ['Credenciais inválidas.']]);
             }
 
@@ -45,6 +46,7 @@ class AuthController extends Controller
             throw $e;
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
@@ -57,6 +59,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Logout realizado com sucesso.']);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }

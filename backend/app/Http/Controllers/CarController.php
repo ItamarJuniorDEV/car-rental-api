@@ -16,7 +16,7 @@ class CarController extends Controller
         $query = Car::query();
 
         if ($request->has('plate')) {
-            $query->where('plate', 'like', '%' . $request->input('plate') . '%');
+            $query->where('plate', 'like', '%'.$request->input('plate').'%');
         }
 
         if ($request->boolean('available')) {
@@ -41,7 +41,7 @@ class CarController extends Controller
     {
         $car = Car::find($id);
 
-        if (!$car) {
+        if (! $car) {
             return response()->json(['message' => 'Veículo não encontrado.'], 404);
         }
 
@@ -53,7 +53,7 @@ class CarController extends Controller
 
     public function store(StoreCarRequest $request): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
@@ -66,19 +66,20 @@ class CarController extends Controller
             ], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function update(UpdateCarRequest $request, int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $car = Car::find($id);
 
-        if (!$car) {
+        if (! $car) {
             return response()->json(['message' => 'Veículo não encontrado.'], 404);
         }
 
@@ -92,19 +93,20 @@ class CarController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function destroy(int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $car = Car::find($id);
 
-        if (!$car) {
+        if (! $car) {
             return response()->json(['message' => 'Veículo não encontrado.'], 404);
         }
 
@@ -118,6 +120,7 @@ class CarController extends Controller
             return response()->json(['message' => 'Veículo removido com sucesso!']);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }

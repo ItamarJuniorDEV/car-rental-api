@@ -16,7 +16,7 @@ class BrandController extends Controller
         $query = Brand::query();
 
         if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->input('name') . '%');
+            $query->where('name', 'like', '%'.$request->input('name').'%');
         }
 
         $brands = $query->paginate(min($request->integer('per_page', 15), 500));
@@ -37,7 +37,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
 
@@ -49,7 +49,7 @@ class BrandController extends Controller
 
     public function store(StoreBrandRequest $request): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
@@ -62,19 +62,20 @@ class BrandController extends Controller
             ], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function update(UpdateBrandRequest $request, int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
 
@@ -88,19 +89,20 @@ class BrandController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function destroy(int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
 
@@ -110,6 +112,7 @@ class BrandController extends Controller
             return response()->json(['message' => 'Marca removida com sucesso!']);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }

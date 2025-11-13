@@ -19,7 +19,7 @@ class RentalController extends Controller
     {
         $rentals = Rental::with(['client', 'car'])->paginate(min($request->integer('per_page', 15), 500));
 
-        $data = array_map(fn($r) => $this->service->format($r), $rentals->items());
+        $data = array_map(fn ($r) => $this->service->format($r), $rentals->items());
 
         return response()->json([
             'message' => 'Locações listadas com sucesso!',
@@ -37,7 +37,7 @@ class RentalController extends Controller
     {
         $rental = Rental::with(['client', 'car'])->find($id);
 
-        if (!$rental) {
+        if (! $rental) {
             return response()->json(['message' => 'Locação não encontrada.'], 404);
         }
 
@@ -60,6 +60,7 @@ class RentalController extends Controller
             throw $e;
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
@@ -68,7 +69,7 @@ class RentalController extends Controller
     {
         $rental = Rental::find($id);
 
-        if (!$rental) {
+        if (! $rental) {
             return response()->json(['message' => 'Locação não encontrada.'], 404);
         }
 
@@ -81,19 +82,20 @@ class RentalController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function destroy(int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $rental = Rental::find($id);
 
-        if (!$rental) {
+        if (! $rental) {
             return response()->json(['message' => 'Locação não encontrada.'], 404);
         }
 
@@ -103,6 +105,7 @@ class RentalController extends Controller
             return response()->json(['message' => 'Locação removida com sucesso!']);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }

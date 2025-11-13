@@ -37,7 +37,7 @@ class LineController extends Controller
     {
         $line = Line::find($id);
 
-        if (!$line) {
+        if (! $line) {
             return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
 
@@ -49,7 +49,7 @@ class LineController extends Controller
 
     public function store(StoreLineRequest $request): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
@@ -62,19 +62,20 @@ class LineController extends Controller
             ], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function update(UpdateLineRequest $request, int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $line = Line::find($id);
 
-        if (!$line) {
+        if (! $line) {
             return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
 
@@ -88,19 +89,20 @@ class LineController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function destroy(int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $line = Line::find($id);
 
-        if (!$line) {
+        if (! $line) {
             return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
 
@@ -110,6 +112,7 @@ class LineController extends Controller
             return response()->json(['message' => 'Linha removida com sucesso!']);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }

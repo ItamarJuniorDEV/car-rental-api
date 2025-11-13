@@ -14,7 +14,7 @@ class RentalService
         return DB::transaction(function () use ($data) {
             $car = Car::lockForUpdate()->find($data['car_id']);
 
-            if (!$car->available) {
+            if (! $car->available) {
                 throw ValidationException::withMessages(['car_id' => ['O veículo não está disponível para locação.']]);
             }
 
@@ -33,6 +33,7 @@ class RentalService
         $rental->save();
 
         if (isset($data['period_actual_end_date'])) {
+            /** @var Car $car */
             $car = $rental->car;
             $car->available = true;
             $car->km = $data['final_km'];
@@ -44,6 +45,7 @@ class RentalService
 
     public function delete(Rental $rental): void
     {
+        /** @var Car $car */
         $car = $rental->car;
         $rental->delete();
 
@@ -78,8 +80,8 @@ class RentalService
 
         return [
             'id' => $rental->id,
-            'period_start_date' => $rental->period_start_date?->format('Y-m-d H:i:s'),
-            'period_expected_end_date' => $rental->period_expected_end_date?->format('Y-m-d H:i:s'),
+            'period_start_date' => $rental->period_start_date->format('Y-m-d H:i:s'),
+            'period_expected_end_date' => $rental->period_expected_end_date->format('Y-m-d H:i:s'),
             'period_actual_end_date' => $rental->period_actual_end_date?->format('Y-m-d H:i:s'),
             'daily_rate' => $rental->daily_rate,
             'initial_km' => $rental->initial_km,

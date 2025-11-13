@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index(): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
@@ -26,7 +26,7 @@ class UserController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
@@ -38,7 +38,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $user = new User();
+            $user = new User;
             $user->name = $validated['name'];
             $user->email = $validated['email'];
             $user->password = Hash::make($validated['password']);
@@ -57,13 +57,14 @@ class UserController extends Controller
             ], 201);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
 
     public function updateRole(Request $request, int $id): JsonResponse
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
@@ -73,7 +74,7 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Usuário não encontrado.'], 404);
         }
 
@@ -95,6 +96,7 @@ class UserController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Erro interno no servidor.'], 500);
         }
     }
