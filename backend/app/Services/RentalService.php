@@ -33,11 +33,7 @@ class RentalService
         $rental->save();
 
         if (isset($data['period_actual_end_date'])) {
-            /** @var Car $car */
-            $car = $rental->car;
-            $car->available = true;
-            $car->km = $data['final_km'];
-            $car->save();
+            $rental->car()->update(['available' => true, 'km' => $data['final_km']]);
         }
 
         return $rental->fresh(['client', 'car']);
@@ -45,27 +41,18 @@ class RentalService
 
     public function delete(Rental $rental): void
     {
-        /** @var Car $car */
-        $car = $rental->car;
+        $rental->car()->update(['available' => true]);
         $rental->delete();
-
-        $car->available = true;
-        $car->save();
     }
 
     public function calcularTaxas(Rental $rental): array
     {
-        $days = max(1, (int) ceil(
-            $rental->period_start_date->diffInHours($rental->period_expected_end_date) / 24
-        ));
-
+        $days = max(1, ceil($rental->period_start_date->diffInHours($rental->period_expected_end_date) / 24));
         $total = $days * $rental->daily_rate;
-        $lateFee = 0.0;
+        $lateFee = 0;
 
         if ($rental->period_actual_end_date && $rental->period_actual_end_date->gt($rental->period_expected_end_date)) {
-            $lateDays = (int) ceil(
-                $rental->period_expected_end_date->diffInHours($rental->period_actual_end_date) / 24
-            );
+            $lateDays = ceil($rental->period_expected_end_date->diffInHours($rental->period_actual_end_date) / 24);
             $lateFee = $lateDays * ($rental->daily_rate * 0.5);
             $total += $lateFee;
         }

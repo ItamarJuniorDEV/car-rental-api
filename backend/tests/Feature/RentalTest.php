@@ -138,7 +138,7 @@ class RentalTest extends TestCase
 
         $data = $response->json('data');
         $this->assertNotNull($data['late_fee']);
-        $this->assertEquals(200.0, $data['late_fee']);
+        $this->assertEquals(200, $data['late_fee']);
     }
 
     public function test_nao_pode_deletar_carro_com_locacao_ativa()
