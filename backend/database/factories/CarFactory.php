@@ -9,19 +9,9 @@ class CarFactory extends Factory
 {
     public function definition()
     {
-        $letters = strtoupper(
-            $this->faker->randomLetter().
-            $this->faker->randomLetter().
-            $this->faker->randomLetter()
-        );
-        $plate = $letters.'-'.
-            $this->faker->numberBetween(1, 9).
-            strtoupper($this->faker->randomLetter()).
-            $this->faker->numberBetween(10, 99);
-
         return [
             'line_id' => Line::factory(),
-            'plate' => $plate,
+            'plate' => $this->faker->regexify('[A-Z]{3}-[0-9][A-Z][0-9]{2}'),
             'available' => true,
             'km' => $this->faker->numberBetween(5000, 120000),
         ];
