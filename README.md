@@ -17,7 +17,7 @@ Desenvolvi esse projeto a partir de uma conversa com o dono de uma locadora pequ
 - Controle de acesso por papel (admin / operador)
 - Gerenciamento de usuários pelo painel (criar, promover, revogar papel)
 - Soft delete em todas as entidades — histórico preservado
-- 65 testes automatizados no backend, 18 no frontend
+- 65 testes automatizados no backend, 42 no frontend
 
 ---
 
@@ -69,8 +69,8 @@ car-rental-app/
 flowchart LR
     Browser <-->|HTTP/JSON| SPA
     SPA <-->|HTTP/JSON + Bearer| API
-    API <--> Repositories
-    Repositories <--> PostgreSQL
+    API <--> Eloquent
+    Eloquent <--> PostgreSQL
 ```
 
 ### Fluxo de Requisição
@@ -80,8 +80,8 @@ flowchart TD
     Request --> Routes
     Routes --> auth:sanctum
     auth:sanctum --> Controller
-    Controller --> Repository
-    Repository --> PostgreSQL
+    Controller --> Eloquent
+    Eloquent --> PostgreSQL
 ```
 
 ### Fluxo de Autenticação
@@ -187,7 +187,6 @@ erDiagram
 - PHP 8.4 + Laravel 12
 - Laravel Sanctum — autenticação por Bearer token
 - PostgreSQL 16
-- Repository Pattern com interfaces (binding no AppServiceProvider)
 - PHPUnit com SQLite in-memory para testes
 - PHPStan nível 5, Laravel Pint
 
