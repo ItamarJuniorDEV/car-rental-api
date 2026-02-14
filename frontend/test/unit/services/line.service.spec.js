@@ -19,7 +19,7 @@ describe('lineService', () => {
     vi.clearAllMocks()
   })
 
-  it('list chama GET /lines com paginação e retorna dados', async () => {
+  it('lista linhas', async () => {
     api.get.mockResolvedValueOnce({ data: [mockLine] })
 
     const result = await lineService.list()
@@ -28,7 +28,7 @@ describe('lineService', () => {
     expect(result).toEqual([mockLine])
   })
 
-  it('create chama POST /lines com payload e retorna linha criada', async () => {
+  it('cria linha', async () => {
     api.post.mockResolvedValueOnce({ data: mockLine })
 
     const result = await lineService.create({ name: 'Corolla', brand_id: 1 })
@@ -37,7 +37,7 @@ describe('lineService', () => {
     expect(result.name).toBe('Corolla')
   })
 
-  it('update chama PUT /lines/:id com payload', async () => {
+  it('atualiza assentos da linha', async () => {
     const updated = { ...mockLine, seats: 7 }
     api.put.mockResolvedValueOnce({ data: updated })
 
@@ -47,7 +47,7 @@ describe('lineService', () => {
     expect(result.seats).toBe(7)
   })
 
-  it('remove chama DELETE /lines/:id', async () => {
+  it('remove linha', async () => {
     api.delete.mockResolvedValueOnce({})
 
     await lineService.remove(1)

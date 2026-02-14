@@ -20,14 +20,14 @@ describe('userService', () => {
     vi.clearAllMocks()
   })
 
-  it('list chama GET /users e retorna dados', async () => {
+  it('lista usuários', async () => {
     api.get.mockResolvedValueOnce({ data: mockUsers })
     const result = await userService.list()
     expect(api.get).toHaveBeenCalledWith('/users')
     expect(result).toEqual(mockUsers)
   })
 
-  it('updateRole chama PATCH /users/:id/role com role correto', async () => {
+  it('atualiza role do usuário', async () => {
     api.patch.mockResolvedValueOnce({ data: { id: 2, name: 'Operador', role: 'admin' } })
     const result = await userService.updateRole(2, 'admin')
     expect(api.patch).toHaveBeenCalledWith('/users/2/role', { role: 'admin' })

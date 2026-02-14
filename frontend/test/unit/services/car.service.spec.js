@@ -19,7 +19,7 @@ describe('carService', () => {
     vi.clearAllMocks()
   })
 
-  it('list chama GET /cars com paginação e retorna dados', async () => {
+  it('lista veículos', async () => {
     api.get.mockResolvedValueOnce({ data: [mockCar] })
 
     const result = await carService.list()
@@ -28,7 +28,7 @@ describe('carService', () => {
     expect(result).toEqual([mockCar])
   })
 
-  it('create chama POST /cars com payload e retorna veículo criado', async () => {
+  it('cria veículo', async () => {
     api.post.mockResolvedValueOnce({ data: mockCar })
 
     const result = await carService.create({ plate: 'ABC-1D23', line_id: 2, km: 15000 })
@@ -37,7 +37,7 @@ describe('carService', () => {
     expect(result.plate).toBe('ABC-1D23')
   })
 
-  it('update chama PUT /cars/:id com payload', async () => {
+  it('atualiza km do veículo', async () => {
     const updated = { ...mockCar, km: 20000 }
     api.put.mockResolvedValueOnce({ data: updated })
 
@@ -47,7 +47,7 @@ describe('carService', () => {
     expect(result.km).toBe(20000)
   })
 
-  it('remove chama DELETE /cars/:id', async () => {
+  it('remove veículo', async () => {
     api.delete.mockResolvedValueOnce({})
 
     await carService.remove(1)

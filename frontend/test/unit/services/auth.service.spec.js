@@ -15,7 +15,7 @@ describe('authService', () => {
     vi.clearAllMocks()
   })
 
-  it('login chama POST /login com credenciais e retorna token', async () => {
+  it('faz login e retorna token', async () => {
     api.post.mockResolvedValueOnce({ data: { token: 'abc123' } })
 
     const result = await authService.login('user@test.com', 'senha123')
@@ -24,7 +24,7 @@ describe('authService', () => {
     expect(result.token).toBe('abc123')
   })
 
-  it('fetchMe chama GET /me e retorna dados do usuário', async () => {
+  it('busca dados do usuário autenticado', async () => {
     const mockUser = { id: 1, name: 'João', role: 'admin' }
     api.get.mockResolvedValueOnce({ data: mockUser })
 
@@ -34,7 +34,7 @@ describe('authService', () => {
     expect(result.name).toBe('João')
   })
 
-  it('logout chama POST /logout', async () => {
+  it('faz logout', async () => {
     api.post.mockResolvedValueOnce({})
 
     await authService.logout()

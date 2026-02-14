@@ -19,7 +19,7 @@ describe('brandService', () => {
     vi.clearAllMocks()
   })
 
-  it('list chama GET /brands com paginação e retorna dados', async () => {
+  it('lista marcas', async () => {
     api.get.mockResolvedValueOnce({ data: [mockBrand] })
 
     const result = await brandService.list()
@@ -28,7 +28,7 @@ describe('brandService', () => {
     expect(result).toEqual([mockBrand])
   })
 
-  it('create chama POST /brands com payload e retorna marca criada', async () => {
+  it('cria marca', async () => {
     api.post.mockResolvedValueOnce({ data: mockBrand })
 
     const result = await brandService.create({ name: 'Toyota', image: 'toyota.png' })
@@ -37,7 +37,7 @@ describe('brandService', () => {
     expect(result.id).toBe(1)
   })
 
-  it('update chama PUT /brands/:id com payload', async () => {
+  it('atualiza marca', async () => {
     const updated = { ...mockBrand, name: 'Toyota Motors' }
     api.put.mockResolvedValueOnce({ data: updated })
 
@@ -47,7 +47,7 @@ describe('brandService', () => {
     expect(result.name).toBe('Toyota Motors')
   })
 
-  it('remove chama DELETE /brands/:id', async () => {
+  it('remove marca', async () => {
     api.delete.mockResolvedValueOnce({})
 
     await brandService.remove(1)

@@ -19,7 +19,7 @@ describe('clientService', () => {
     vi.clearAllMocks()
   })
 
-  it('list chama GET /clients com paginação e retorna dados', async () => {
+  it('lista clientes', async () => {
     api.get.mockResolvedValueOnce({ data: [mockClient] })
 
     const result = await clientService.list()
@@ -28,7 +28,7 @@ describe('clientService', () => {
     expect(result).toEqual([mockClient])
   })
 
-  it('create chama POST /clients com payload e retorna cliente criado', async () => {
+  it('cria cliente', async () => {
     api.post.mockResolvedValueOnce({ data: mockClient })
 
     const result = await clientService.create({ name: 'Maria Silva', cpf: '123.456.789-00' })
@@ -37,7 +37,7 @@ describe('clientService', () => {
     expect(result.name).toBe('Maria Silva')
   })
 
-  it('update chama PUT /clients/:id com payload', async () => {
+  it('atualiza telefone do cliente', async () => {
     const updated = { ...mockClient, phone: '11988887777' }
     api.put.mockResolvedValueOnce({ data: updated })
 
@@ -47,7 +47,7 @@ describe('clientService', () => {
     expect(result.phone).toBe('11988887777')
   })
 
-  it('remove chama DELETE /clients/:id', async () => {
+  it('remove cliente', async () => {
     api.delete.mockResolvedValueOnce({})
 
     await clientService.remove(1)

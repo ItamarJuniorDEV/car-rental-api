@@ -31,8 +31,8 @@ class CarSeeder extends Seeder
         ];
 
         $plates = [
-            'ABC-1D23', 'DEF-2E45', 'GHI-3F67', 'JKL-4G89',
-            'MNO-5H01', 'PQR-6I23', 'STU-7J45', 'VWX-8K67',
+            'HQB-3K52', 'RTP-7A94', 'MFC-2J31', 'NVA-5B87',
+            'KDR-4T16', 'WZF-8G23', 'LJS-1H48', 'CTU-6M75',
         ];
 
         $kms = [12000, 34500, 87200, 5600, 62100, 19800, 45300, 73000];
