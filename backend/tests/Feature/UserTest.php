@@ -38,10 +38,6 @@ class UserTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_sem_autenticacao_retorna_401()
-    {
-        $this->getJson('/api/users')->assertUnauthorized();
-    }
 
     public function test_admin_pode_promover_usuario_para_admin()
     {

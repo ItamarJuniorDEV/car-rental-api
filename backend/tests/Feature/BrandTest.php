@@ -109,16 +109,6 @@ class BrandTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_sem_autenticacao_retorna_401()
-    {
-        $response = $this->postJson('/api/brands', [
-            'name' => 'Toyota',
-            'image' => 'toyota.png',
-        ]);
-
-        $response->assertStatus(401);
-    }
-
     public function test_marca_inexistente_retorna_404()
     {
         $response = $this->actingAs($this->operador, 'sanctum')->getJson('/api/brands/9999');

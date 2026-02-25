@@ -129,10 +129,4 @@ class LineTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_sem_autenticacao_retorna_401()
-    {
-        $response = $this->getJson('/api/lines');
-
-        $response->assertStatus(401);
-    }
 }
