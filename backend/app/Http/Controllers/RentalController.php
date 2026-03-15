@@ -89,15 +89,13 @@ class RentalController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $rental = Rental::find($id);
 
         if (! $rental) {
             return response()->json(['message' => 'Locação não encontrada.'], 404);
         }
+
+        $this->authorize('delete', $rental);
 
         try {
             $this->service->delete($rental);

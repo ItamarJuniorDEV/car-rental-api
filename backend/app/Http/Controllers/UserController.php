@@ -12,9 +12,7 @@ class UserController extends Controller
 {
     public function index(): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('viewAny', User::class);
 
         $users = User::select('id', 'name', 'email', 'role', 'created_at')->get();
 
@@ -26,9 +24,7 @@ class UserController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', User::class);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -64,19 +60,17 @@ class UserController extends Controller
 
     public function updateRole(Request $request, int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $validated = $request->validate([
-            'role' => ['required', 'in:admin,user'],
-        ]);
-
         $user = User::find($id);
 
         if (! $user) {
             return response()->json(['message' => 'Usuário não encontrado.'], 404);
         }
+
+        $this->authorize('updateRole', $user);
+
+        $validated = $request->validate([
+            'role' => ['required', 'in:admin,user'],
+        ]);
 
         if ($user->id === auth()->id()) {
             return response()->json(['erro' => 'Não é possível alterar o próprio perfil.'], 422);
