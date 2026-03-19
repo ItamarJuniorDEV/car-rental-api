@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Usuários listados com sucesso!',
-            'data' => $users,
+            'data' => UserResource::collection($users)->resolve(),
         ]);
     }
 
@@ -47,13 +48,7 @@ class UserController extends Controller
 
             return response()->json([
                 'message' => 'Usuário criado com sucesso!',
-                'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'created_at' => $user->created_at,
-                ],
+                'data' => (new UserResource($user))->resolve(),
             ], 201);
         } catch (Throwable $e) {
             report($e);

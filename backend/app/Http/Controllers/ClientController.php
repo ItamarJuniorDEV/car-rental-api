@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
+use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class ClientController extends Controller
 
         return response()->json([
             'message' => 'Clientes listados com sucesso!',
-            'data' => $clients->items(),
+            'data' => ClientResource::collection($clients->getCollection())->resolve(),
             'pagination' => [
                 'total' => $clients->total(),
                 'per_page' => $clients->perPage(),
@@ -43,7 +44,7 @@ class ClientController extends Controller
 
         return response()->json([
             'message' => 'Cliente encontrado com sucesso!',
-            'data' => $client,
+            'data' => (new ClientResource($client))->resolve(),
         ]);
     }
 
@@ -54,7 +55,7 @@ class ClientController extends Controller
 
             return response()->json([
                 'message' => 'Cliente criado com sucesso!',
-                'data' => $client,
+                'data' => (new ClientResource($client))->resolve(),
             ], 201);
         } catch (Throwable $e) {
             report($e);
@@ -77,7 +78,7 @@ class ClientController extends Controller
 
             return response()->json([
                 'message' => 'Cliente atualizado com sucesso!',
-                'data' => $client,
+                'data' => (new ClientResource($client))->resolve(),
             ]);
         } catch (Throwable $e) {
             report($e);

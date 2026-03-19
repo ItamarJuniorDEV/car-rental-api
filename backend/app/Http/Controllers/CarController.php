@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCarRequest;
 use App\Http\Requests\UpdateCarRequest;
+use App\Http\Resources\CarResource;
 use App\Models\Car;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class CarController extends Controller
 
         return response()->json([
             'message' => 'Veículos listados com sucesso!',
-            'data' => $cars->items(),
+            'data' => CarResource::collection($cars->getCollection())->resolve(),
             'pagination' => [
                 'total' => $cars->total(),
                 'per_page' => $cars->perPage(),
@@ -47,7 +48,7 @@ class CarController extends Controller
 
         return response()->json([
             'message' => 'Veículo encontrado com sucesso!',
-            'data' => $car,
+            'data' => (new CarResource($car))->resolve(),
         ]);
     }
 
@@ -62,7 +63,7 @@ class CarController extends Controller
 
             return response()->json([
                 'message' => 'Veículo criado com sucesso!',
-                'data' => $car,
+                'data' => (new CarResource($car))->resolve(),
             ], 201);
         } catch (Throwable $e) {
             report($e);
@@ -89,7 +90,7 @@ class CarController extends Controller
 
             return response()->json([
                 'message' => 'Veículo atualizado com sucesso!',
-                'data' => $car,
+                'data' => (new CarResource($car))->resolve(),
             ]);
         } catch (Throwable $e) {
             report($e);
