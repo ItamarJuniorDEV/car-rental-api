@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Car;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -9,7 +10,13 @@ class UpdateCarRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $car = $this->route('car');
+
+        if (! $car instanceof Car) {
+            $car = Car::find($car);
+        }
+
+        return $car !== null && ($this->user()?->can('update', $car) ?? false);
     }
 
     public function rules(): array

@@ -10,7 +10,13 @@ class UpdateRentalRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $rental = $this->route('rental');
+
+        if (! $rental instanceof Rental) {
+            $rental = Rental::find($rental);
+        }
+
+        return $rental !== null && ($this->user()?->can('update', $rental) ?? false);
     }
 
     public function rules(): array

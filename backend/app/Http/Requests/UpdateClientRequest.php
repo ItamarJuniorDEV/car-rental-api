@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Client;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -9,7 +10,13 @@ class UpdateClientRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $client = $this->route('client');
+
+        if (! $client instanceof Client) {
+            $client = Client::find($client);
+        }
+
+        return $client !== null && ($this->user()?->can('update', $client) ?? false);
     }
 
     public function rules(): array
