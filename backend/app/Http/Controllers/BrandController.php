@@ -33,14 +33,8 @@ class BrandController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Brand $brand): JsonResponse
     {
-        $brand = Brand::find($id);
-
-        if (! $brand) {
-            return response()->json(['message' => 'Marca não encontrada.'], 404);
-        }
-
         return response()->json([
             'message' => 'Marca encontrada com sucesso!',
             'data' => $brand,
@@ -67,16 +61,10 @@ class BrandController extends Controller
         }
     }
 
-    public function update(UpdateBrandRequest $request, int $id): JsonResponse
+    public function update(UpdateBrandRequest $request, Brand $brand): JsonResponse
     {
         if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $brand = Brand::find($id);
-
-        if (! $brand) {
-            return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
 
         try {
@@ -94,16 +82,10 @@ class BrandController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Brand $brand): JsonResponse
     {
         if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $brand = Brand::find($id);
-
-        if (! $brand) {
-            return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
 
         try {

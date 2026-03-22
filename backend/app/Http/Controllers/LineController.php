@@ -33,14 +33,8 @@ class LineController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Line $line): JsonResponse
     {
-        $line = Line::find($id);
-
-        if (! $line) {
-            return response()->json(['message' => 'Linha não encontrada.'], 404);
-        }
-
         return response()->json([
             'message' => 'Linha encontrada com sucesso!',
             'data' => $line,
@@ -67,16 +61,10 @@ class LineController extends Controller
         }
     }
 
-    public function update(UpdateLineRequest $request, int $id): JsonResponse
+    public function update(UpdateLineRequest $request, Line $line): JsonResponse
     {
         if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $line = Line::find($id);
-
-        if (! $line) {
-            return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
 
         try {
@@ -94,16 +82,10 @@ class LineController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Line $line): JsonResponse
     {
         if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $line = Line::find($id);
-
-        if (! $line) {
-            return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
 
         try {
