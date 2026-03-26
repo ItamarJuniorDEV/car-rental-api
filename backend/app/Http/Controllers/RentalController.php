@@ -8,8 +8,6 @@ use App\Models\Rental;
 use App\Services\RentalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class RentalController extends Controller
 {
@@ -49,20 +47,12 @@ class RentalController extends Controller
 
     public function store(StoreRentalRequest $request): JsonResponse
     {
-        try {
-            $rental = $this->service->create($request->validated());
+        $rental = $this->service->create($request->validated());
 
-            return response()->json([
-                'message' => 'Locação criada com sucesso!',
-                'data' => $this->service->format($rental),
-            ], 201);
-        } catch (ValidationException $e) {
-            throw $e;
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Locação criada com sucesso!',
+            'data' => $this->service->format($rental),
+        ], 201);
     }
 
     public function update(UpdateRentalRequest $request, int $id): JsonResponse
@@ -73,18 +63,12 @@ class RentalController extends Controller
             return response()->json(['message' => 'Locação não encontrada.'], 404);
         }
 
-        try {
-            $updated = $this->service->update($rental, $request->validated());
+        $updated = $this->service->update($rental, $request->validated());
 
-            return response()->json([
-                'message' => 'Locação atualizada com sucesso!',
-                'data' => $this->service->format($updated),
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Locação atualizada com sucesso!',
+            'data' => $this->service->format($updated),
+        ]);
     }
 
     public function destroy(int $id): JsonResponse
@@ -99,14 +83,8 @@ class RentalController extends Controller
             return response()->json(['message' => 'Locação não encontrada.'], 404);
         }
 
-        try {
-            $this->service->delete($rental);
+        $this->service->delete($rental);
 
-            return response()->json(['message' => 'Locação removida com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Locação removida com sucesso!']);
     }
 }
