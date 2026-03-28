@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateUserRoleRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,7 +59,7 @@ class UserController extends Controller
         }
     }
 
-    public function updateRole(Request $request, int $id): JsonResponse
+    public function updateRole(UpdateUserRoleRequest $request, int $id): JsonResponse
     {
         $user = User::find($id);
 
@@ -66,18 +67,12 @@ class UserController extends Controller
             return response()->json(['message' => 'Usuário não encontrado.'], 404);
         }
 
-        $this->authorize('updateRole', $user);
-
-        $validated = $request->validate([
-            'role' => ['required', 'in:admin,user'],
-        ]);
-
         if ($user->id === auth()->id()) {
             return response()->json(['erro' => 'Não é possível alterar o próprio perfil.'], 422);
         }
 
         try {
-            $user->role = $validated['role'];
+            $user->role = $request->validated('role');
             $user->save();
 
             return response()->json([
