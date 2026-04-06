@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
+use App\Http\Resources\BrandResource;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class BrandController extends Controller
 
         return response()->json([
             'message' => 'Marcas listadas com sucesso!',
-            'data' => $brands->items(),
+            'data' => BrandResource::collection($brands->getCollection())->resolve(),
             'pagination' => [
                 'total' => $brands->total(),
                 'per_page' => $brands->perPage(),
@@ -37,7 +38,7 @@ class BrandController extends Controller
     {
         return response()->json([
             'message' => 'Marca encontrada com sucesso!',
-            'data' => $brand,
+            'data' => (new BrandResource($brand))->resolve(),
         ]);
     }
 
@@ -50,7 +51,7 @@ class BrandController extends Controller
 
             return response()->json([
                 'message' => 'Marca criada com sucesso!',
-                'data' => $brand,
+                'data' => (new BrandResource($brand))->resolve(),
             ], 201);
         } catch (Throwable $e) {
             report($e);
@@ -69,7 +70,7 @@ class BrandController extends Controller
 
             return response()->json([
                 'message' => 'Marca atualizada com sucesso!',
-                'data' => $brand,
+                'data' => (new BrandResource($brand))->resolve(),
             ]);
         } catch (Throwable $e) {
             report($e);

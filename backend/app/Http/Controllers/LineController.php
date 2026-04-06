@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLineRequest;
 use App\Http\Requests\UpdateLineRequest;
+use App\Http\Resources\LineResource;
 use App\Models\Line;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class LineController extends Controller
 
         return response()->json([
             'message' => 'Linhas listadas com sucesso!',
-            'data' => $lines->items(),
+            'data' => LineResource::collection($lines->getCollection())->resolve(),
             'pagination' => [
                 'total' => $lines->total(),
                 'per_page' => $lines->perPage(),
@@ -37,7 +38,7 @@ class LineController extends Controller
     {
         return response()->json([
             'message' => 'Linha encontrada com sucesso!',
-            'data' => $line,
+            'data' => (new LineResource($line))->resolve(),
         ]);
     }
 
@@ -50,7 +51,7 @@ class LineController extends Controller
 
             return response()->json([
                 'message' => 'Linha criada com sucesso!',
-                'data' => $line,
+                'data' => (new LineResource($line))->resolve(),
             ], 201);
         } catch (Throwable $e) {
             report($e);
@@ -69,7 +70,7 @@ class LineController extends Controller
 
             return response()->json([
                 'message' => 'Linha atualizada com sucesso!',
-                'data' => $line,
+                'data' => (new LineResource($line))->resolve(),
             ]);
         } catch (Throwable $e) {
             report($e);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRentalRequest;
 use App\Http\Requests\UpdateRentalRequest;
+use App\Http\Resources\RentalResource;
 use App\Models\Rental;
 use App\Services\RentalService;
 use Illuminate\Http\JsonResponse;
@@ -19,11 +20,9 @@ class RentalController extends Controller
     {
         $rentals = Rental::with(['client', 'car'])->paginate(min($request->integer('per_page', 15), 500));
 
-        $data = array_map(fn ($r) => $this->service->format($r), $rentals->items());
-
         return response()->json([
             'message' => 'Locações listadas com sucesso!',
-            'data' => $data,
+            'data' => RentalResource::collection($rentals->getCollection())->resolve(),
             'pagination' => [
                 'total' => $rentals->total(),
                 'per_page' => $rentals->perPage(),
@@ -39,7 +38,7 @@ class RentalController extends Controller
 
         return response()->json([
             'message' => 'Locação encontrada com sucesso!',
-            'data' => $this->service->format($rental),
+            'data' => (new RentalResource($rental))->resolve(),
         ]);
     }
 
@@ -50,7 +49,7 @@ class RentalController extends Controller
 
             return response()->json([
                 'message' => 'Locação criada com sucesso!',
-                'data' => $this->service->format($rental),
+                'data' => (new RentalResource($rental))->resolve(),
             ], 201);
         } catch (ValidationException $e) {
             throw $e;
@@ -68,7 +67,7 @@ class RentalController extends Controller
 
             return response()->json([
                 'message' => 'Locação atualizada com sucesso!',
-                'data' => $this->service->format($updated),
+                'data' => (new RentalResource($updated))->resolve(),
             ]);
         } catch (Throwable $e) {
             report($e);
