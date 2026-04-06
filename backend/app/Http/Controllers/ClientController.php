@@ -33,14 +33,8 @@ class ClientController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Client $client): JsonResponse
     {
-        $client = Client::find($id);
-
-        if (! $client) {
-            return response()->json(['message' => 'Cliente não encontrado.'], 404);
-        }
-
         return response()->json([
             'message' => 'Cliente encontrado com sucesso!',
             'data' => $client,
@@ -63,14 +57,8 @@ class ClientController extends Controller
         }
     }
 
-    public function update(UpdateClientRequest $request, int $id): JsonResponse
+    public function update(UpdateClientRequest $request, Client $client): JsonResponse
     {
-        $client = Client::find($id);
-
-        if (! $client) {
-            return response()->json(['message' => 'Cliente não encontrado.'], 404);
-        }
-
         try {
             $client->fill($request->validated());
             $client->save();
@@ -86,14 +74,8 @@ class ClientController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Client $client): JsonResponse
     {
-        $client = Client::find($id);
-
-        if (! $client) {
-            return response()->json(['message' => 'Cliente não encontrado.'], 404);
-        }
-
         if ($client->rentals()->whereNull('period_actual_end_date')->exists()) {
             return response()->json(['message' => 'Não é possível remover um cliente com locação ativa.'], 422);
         }

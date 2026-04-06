@@ -33,14 +33,8 @@ class LineController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Line $line): JsonResponse
     {
-        $line = Line::find($id);
-
-        if (! $line) {
-            return response()->json(['message' => 'Linha não encontrada.'], 404);
-        }
-
         return response()->json([
             'message' => 'Linha encontrada com sucesso!',
             'data' => $line,
@@ -65,14 +59,8 @@ class LineController extends Controller
         }
     }
 
-    public function update(UpdateLineRequest $request, int $id): JsonResponse
+    public function update(UpdateLineRequest $request, Line $line): JsonResponse
     {
-        $line = Line::find($id);
-
-        if (! $line) {
-            return response()->json(['message' => 'Linha não encontrada.'], 404);
-        }
-
         $this->authorize('update', $line);
 
         try {
@@ -90,14 +78,8 @@ class LineController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Line $line): JsonResponse
     {
-        $line = Line::find($id);
-
-        if (! $line) {
-            return response()->json(['message' => 'Linha não encontrada.'], 404);
-        }
-
         $this->authorize('delete', $line);
 
         try {

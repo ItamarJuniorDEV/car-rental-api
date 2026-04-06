@@ -33,13 +33,9 @@ class RentalController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Rental $rental): JsonResponse
     {
-        $rental = Rental::with(['client', 'car'])->find($id);
-
-        if (! $rental) {
-            return response()->json(['message' => 'Locação não encontrada.'], 404);
-        }
+        $rental->load(['client', 'car']);
 
         return response()->json([
             'message' => 'Locação encontrada com sucesso!',
@@ -65,14 +61,8 @@ class RentalController extends Controller
         }
     }
 
-    public function update(UpdateRentalRequest $request, int $id): JsonResponse
+    public function update(UpdateRentalRequest $request, Rental $rental): JsonResponse
     {
-        $rental = Rental::find($id);
-
-        if (! $rental) {
-            return response()->json(['message' => 'Locação não encontrada.'], 404);
-        }
-
         try {
             $updated = $this->service->update($rental, $request->validated());
 
@@ -87,14 +77,8 @@ class RentalController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Rental $rental): JsonResponse
     {
-        $rental = Rental::find($id);
-
-        if (! $rental) {
-            return response()->json(['message' => 'Locação não encontrada.'], 404);
-        }
-
         $this->authorize('delete', $rental);
 
         try {

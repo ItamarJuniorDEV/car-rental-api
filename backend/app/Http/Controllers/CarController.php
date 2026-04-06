@@ -37,14 +37,8 @@ class CarController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Car $car): JsonResponse
     {
-        $car = Car::find($id);
-
-        if (! $car) {
-            return response()->json(['message' => 'Veículo não encontrado.'], 404);
-        }
-
         return response()->json([
             'message' => 'Veículo encontrado com sucesso!',
             'data' => $car,
@@ -69,14 +63,8 @@ class CarController extends Controller
         }
     }
 
-    public function update(UpdateCarRequest $request, int $id): JsonResponse
+    public function update(UpdateCarRequest $request, Car $car): JsonResponse
     {
-        $car = Car::find($id);
-
-        if (! $car) {
-            return response()->json(['message' => 'Veículo não encontrado.'], 404);
-        }
-
         $this->authorize('update', $car);
 
         try {
@@ -94,14 +82,8 @@ class CarController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Car $car): JsonResponse
     {
-        $car = Car::find($id);
-
-        if (! $car) {
-            return response()->json(['message' => 'Veículo não encontrado.'], 404);
-        }
-
         $this->authorize('delete', $car);
 
         if ($car->rentals()->whereNull('period_actual_end_date')->exists()) {
