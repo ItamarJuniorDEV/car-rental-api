@@ -53,9 +53,7 @@ class CarController extends Controller
 
     public function store(StoreCarRequest $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', Car::class);
 
         try {
             $car = Car::create($request->validated());
@@ -73,15 +71,13 @@ class CarController extends Controller
 
     public function update(UpdateCarRequest $request, int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $car = Car::find($id);
 
         if (! $car) {
             return response()->json(['message' => 'Veículo não encontrado.'], 404);
         }
+
+        $this->authorize('update', $car);
 
         try {
             $car->fill($request->validated());
@@ -100,15 +96,13 @@ class CarController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $car = Car::find($id);
 
         if (! $car) {
             return response()->json(['message' => 'Veículo não encontrado.'], 404);
         }
+
+        $this->authorize('delete', $car);
 
         if ($car->rentals()->whereNull('period_actual_end_date')->exists()) {
             return response()->json(['message' => 'Não é possível remover um veículo com locação ativa.'], 422);

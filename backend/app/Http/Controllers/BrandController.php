@@ -49,9 +49,7 @@ class BrandController extends Controller
 
     public function store(StoreBrandRequest $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', Brand::class);
 
         try {
             $brand = Brand::create($request->validated());
@@ -69,15 +67,13 @@ class BrandController extends Controller
 
     public function update(UpdateBrandRequest $request, int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $brand = Brand::find($id);
 
         if (! $brand) {
             return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
+
+        $this->authorize('update', $brand);
 
         try {
             $brand->fill($request->validated());
@@ -96,15 +92,13 @@ class BrandController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $brand = Brand::find($id);
 
         if (! $brand) {
             return response()->json(['message' => 'Marca não encontrada.'], 404);
         }
+
+        $this->authorize('delete', $brand);
 
         try {
             $brand->delete();

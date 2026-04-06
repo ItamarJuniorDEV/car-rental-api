@@ -49,9 +49,7 @@ class LineController extends Controller
 
     public function store(StoreLineRequest $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', Line::class);
 
         try {
             $line = Line::create($request->validated());
@@ -69,15 +67,13 @@ class LineController extends Controller
 
     public function update(UpdateLineRequest $request, int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $line = Line::find($id);
 
         if (! $line) {
             return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
+
+        $this->authorize('update', $line);
 
         try {
             $line->fill($request->validated());
@@ -96,15 +92,13 @@ class LineController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
         $line = Line::find($id);
 
         if (! $line) {
             return response()->json(['message' => 'Linha não encontrada.'], 404);
         }
+
+        $this->authorize('delete', $line);
 
         try {
             $line->delete();
