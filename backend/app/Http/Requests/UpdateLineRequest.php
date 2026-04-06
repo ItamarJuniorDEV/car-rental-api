@@ -2,13 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Line;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateLineRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $line = $this->route('line');
+
+        if (! $line instanceof Line) {
+            $line = Line::find($line);
+        }
+
+        return $line !== null && ($this->user()?->can('update', $line) ?? false);
     }
 
     public function rules(): array
