@@ -8,7 +8,6 @@ use App\Http\Resources\CarResource;
 use App\Models\Car;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class CarController extends Controller
 {
@@ -50,37 +49,25 @@ class CarController extends Controller
     {
         $this->authorize('create', Car::class);
 
-        try {
-            $car = Car::create($request->validated());
+        $car = Car::create($request->validated());
 
-            return response()->json([
-                'message' => 'Veículo criado com sucesso!',
-                'data' => (new CarResource($car))->resolve(),
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Veículo criado com sucesso!',
+            'data' => (new CarResource($car))->resolve(),
+        ], 201);
     }
 
     public function update(UpdateCarRequest $request, Car $car): JsonResponse
     {
         $this->authorize('update', $car);
 
-        try {
-            $car->fill($request->validated());
-            $car->save();
+        $car->fill($request->validated());
+        $car->save();
 
-            return response()->json([
-                'message' => 'Veículo atualizado com sucesso!',
-                'data' => (new CarResource($car))->resolve(),
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Veículo atualizado com sucesso!',
+            'data' => (new CarResource($car))->resolve(),
+        ]);
     }
 
     public function destroy(Car $car): JsonResponse
@@ -91,14 +78,8 @@ class CarController extends Controller
             return response()->json(['message' => 'Não é possível remover um veículo com locação ativa.'], 422);
         }
 
-        try {
-            $car->delete();
+        $car->delete();
 
-            return response()->json(['message' => 'Veículo removido com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Veículo removido com sucesso!']);
     }
 }

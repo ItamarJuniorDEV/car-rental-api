@@ -8,7 +8,6 @@ use App\Http\Resources\BrandResource;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class BrandController extends Controller
 {
@@ -46,51 +45,33 @@ class BrandController extends Controller
     {
         $this->authorize('create', Brand::class);
 
-        try {
-            $brand = Brand::create($request->validated());
+        $brand = Brand::create($request->validated());
 
-            return response()->json([
-                'message' => 'Marca criada com sucesso!',
-                'data' => (new BrandResource($brand))->resolve(),
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Marca criada com sucesso!',
+            'data' => (new BrandResource($brand))->resolve(),
+        ], 201);
     }
 
     public function update(UpdateBrandRequest $request, Brand $brand): JsonResponse
     {
         $this->authorize('update', $brand);
 
-        try {
-            $brand->fill($request->validated());
-            $brand->save();
+        $brand->fill($request->validated());
+        $brand->save();
 
-            return response()->json([
-                'message' => 'Marca atualizada com sucesso!',
-                'data' => (new BrandResource($brand))->resolve(),
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Marca atualizada com sucesso!',
+            'data' => (new BrandResource($brand))->resolve(),
+        ]);
     }
 
     public function destroy(Brand $brand): JsonResponse
     {
         $this->authorize('delete', $brand);
 
-        try {
-            $brand->delete();
+        $brand->delete();
 
-            return response()->json(['message' => 'Marca removida com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Marca removida com sucesso!']);
     }
 }

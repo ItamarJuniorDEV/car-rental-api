@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Throwable;
 
 class UserController extends Controller
 {
@@ -35,23 +34,17 @@ class UserController extends Controller
             'role' => ['required', 'in:admin,user'],
         ]);
 
-        try {
-            $user = new User;
-            $user->name = $validated['name'];
-            $user->email = $validated['email'];
-            $user->password = Hash::make($validated['password']);
-            $user->role = $validated['role'];
-            $user->save();
+        $user = new User;
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make($validated['password']);
+        $user->role = $validated['role'];
+        $user->save();
 
-            return response()->json([
-                'message' => 'Usuário criado com sucesso!',
-                'data' => (new UserResource($user))->resolve(),
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Usuário criado com sucesso!',
+            'data' => (new UserResource($user))->resolve(),
+        ], 201);
     }
 
     public function updateRole(UpdateUserRoleRequest $request, int $id): JsonResponse
@@ -66,22 +59,16 @@ class UserController extends Controller
             return response()->json(['erro' => 'Não é possível alterar o próprio perfil.'], 422);
         }
 
-        try {
-            $user->role = $request->validated('role');
-            $user->save();
+        $user->role = $request->validated('role');
+        $user->save();
 
-            return response()->json([
-                'message' => 'Perfil atualizado com sucesso!',
-                'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'role' => $user->role,
-                ],
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Perfil atualizado com sucesso!',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'role' => $user->role,
+            ],
+        ]);
     }
 }

@@ -8,7 +8,6 @@ use App\Http\Resources\LineResource;
 use App\Models\Line;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class LineController extends Controller
 {
@@ -46,51 +45,33 @@ class LineController extends Controller
     {
         $this->authorize('create', Line::class);
 
-        try {
-            $line = Line::create($request->validated());
+        $line = Line::create($request->validated());
 
-            return response()->json([
-                'message' => 'Linha criada com sucesso!',
-                'data' => (new LineResource($line))->resolve(),
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Linha criada com sucesso!',
+            'data' => (new LineResource($line))->resolve(),
+        ], 201);
     }
 
     public function update(UpdateLineRequest $request, Line $line): JsonResponse
     {
         $this->authorize('update', $line);
 
-        try {
-            $line->fill($request->validated());
-            $line->save();
+        $line->fill($request->validated());
+        $line->save();
 
-            return response()->json([
-                'message' => 'Linha atualizada com sucesso!',
-                'data' => (new LineResource($line))->resolve(),
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Linha atualizada com sucesso!',
+            'data' => (new LineResource($line))->resolve(),
+        ]);
     }
 
     public function destroy(Line $line): JsonResponse
     {
         $this->authorize('delete', $line);
 
-        try {
-            $line->delete();
+        $line->delete();
 
-            return response()->json(['message' => 'Linha removida com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Linha removida com sucesso!']);
     }
 }

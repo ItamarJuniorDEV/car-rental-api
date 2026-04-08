@@ -8,7 +8,6 @@ use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class ClientController extends Controller
 {
@@ -44,35 +43,23 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request): JsonResponse
     {
-        try {
-            $client = Client::create($request->validated());
+        $client = Client::create($request->validated());
 
-            return response()->json([
-                'message' => 'Cliente criado com sucesso!',
-                'data' => (new ClientResource($client))->resolve(),
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Cliente criado com sucesso!',
+            'data' => (new ClientResource($client))->resolve(),
+        ], 201);
     }
 
     public function update(UpdateClientRequest $request, Client $client): JsonResponse
     {
-        try {
-            $client->fill($request->validated());
-            $client->save();
+        $client->fill($request->validated());
+        $client->save();
 
-            return response()->json([
-                'message' => 'Cliente atualizado com sucesso!',
-                'data' => (new ClientResource($client))->resolve(),
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Cliente atualizado com sucesso!',
+            'data' => (new ClientResource($client))->resolve(),
+        ]);
     }
 
     public function destroy(Client $client): JsonResponse
@@ -81,14 +68,8 @@ class ClientController extends Controller
             return response()->json(['message' => 'Não é possível remover um cliente com locação ativa.'], 422);
         }
 
-        try {
-            $client->delete();
+        $client->delete();
 
-            return response()->json(['message' => 'Cliente removido com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Cliente removido com sucesso!']);
     }
 }
