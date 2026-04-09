@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCarRequest;
 use App\Http\Requests\UpdateCarRequest;
+use App\Http\Resources\CarResource;
 use App\Models\Car;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class CarController extends Controller
 {
@@ -27,7 +27,7 @@ class CarController extends Controller
 
         return response()->json([
             'message' => 'Veículos listados com sucesso!',
-            'data' => $cars->items(),
+            'data' => CarResource::collection($cars->getCollection())->resolve(),
             'pagination' => [
                 'total' => $cars->total(),
                 'per_page' => $cars->perPage(),
@@ -37,91 +37,49 @@ class CarController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Car $car): JsonResponse
     {
-        $car = Car::find($id);
-
-        if (! $car) {
-            return response()->json(['message' => 'Veículo não encontrado.'], 404);
-        }
-
         return response()->json([
             'message' => 'Veículo encontrado com sucesso!',
-            'data' => $car,
+            'data' => (new CarResource($car))->resolve(),
         ]);
     }
 
     public function store(StoreCarRequest $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', Car::class);
 
-        try {
-            $car = Car::create($request->validated());
+        $car = Car::create($request->validated());
 
-            return response()->json([
-                'message' => 'Veículo criado com sucesso!',
-                'data' => $car,
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Veículo criado com sucesso!',
+            'data' => (new CarResource($car))->resolve(),
+        ], 201);
     }
 
-    public function update(UpdateCarRequest $request, int $id): JsonResponse
+    public function update(UpdateCarRequest $request, Car $car): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('update', $car);
 
-        $car = Car::find($id);
+        $car->fill($request->validated());
+        $car->save();
 
-        if (! $car) {
-            return response()->json(['message' => 'Veículo não encontrado.'], 404);
-        }
-
-        try {
-            $car->fill($request->validated());
-            $car->save();
-
-            return response()->json([
-                'message' => 'Veículo atualizado com sucesso!',
-                'data' => $car,
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Veículo atualizado com sucesso!',
+            'data' => (new CarResource($car))->resolve(),
+        ]);
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Car $car): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $car = Car::find($id);
-
-        if (! $car) {
-            return response()->json(['message' => 'Veículo não encontrado.'], 404);
-        }
+        $this->authorize('delete', $car);
 
         if ($car->rentals()->whereNull('period_actual_end_date')->exists()) {
             return response()->json(['message' => 'Não é possível remover um veículo com locação ativa.'], 422);
         }
 
-        try {
-            $car->delete();
+        $car->delete();
 
-            return response()->json(['message' => 'Veículo removido com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Veículo removido com sucesso!']);
     }
 }

@@ -2,33 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateUserRoleRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Throwable;
 
 class UserController extends Controller
 {
     public function index(): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('viewAny', User::class);
 
         $users = User::select('id', 'name', 'email', 'role', 'created_at')->get();
 
         return response()->json([
             'message' => 'Usuários listados com sucesso!',
-            'data' => $users,
+            'data' => UserResource::collection($users)->resolve(),
         ]);
     }
 
     public function store(Request $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', User::class);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -37,41 +34,21 @@ class UserController extends Controller
             'role' => ['required', 'in:admin,user'],
         ]);
 
-        try {
-            $user = new User;
-            $user->name = $validated['name'];
-            $user->email = $validated['email'];
-            $user->password = Hash::make($validated['password']);
-            $user->role = $validated['role'];
-            $user->save();
+        $user = new User;
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make($validated['password']);
+        $user->role = $validated['role'];
+        $user->save();
 
-            return response()->json([
-                'message' => 'Usuário criado com sucesso!',
-                'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'created_at' => $user->created_at,
-                ],
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Usuário criado com sucesso!',
+            'data' => (new UserResource($user))->resolve(),
+        ], 201);
     }
 
-    public function updateRole(Request $request, int $id): JsonResponse
+    public function updateRole(UpdateUserRoleRequest $request, int $id): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
-
-        $validated = $request->validate([
-            'role' => ['required', 'in:admin,user'],
-        ]);
-
         $user = User::find($id);
 
         if (! $user) {
@@ -82,22 +59,16 @@ class UserController extends Controller
             return response()->json(['erro' => 'Não é possível alterar o próprio perfil.'], 422);
         }
 
-        try {
-            $user->role = $validated['role'];
-            $user->save();
+        $user->role = $request->validated('role');
+        $user->save();
 
-            return response()->json([
-                'message' => 'Perfil atualizado com sucesso!',
-                'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'role' => $user->role,
-                ],
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Perfil atualizado com sucesso!',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'role' => $user->role,
+            ],
+        ]);
     }
 }

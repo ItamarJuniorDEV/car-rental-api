@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Line;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreLineRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Line::class) ?? false;
     }
 
     public function rules(): array

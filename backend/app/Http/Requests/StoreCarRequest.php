@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Car;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCarRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Car::class) ?? false;
     }
 
     public function rules(): array

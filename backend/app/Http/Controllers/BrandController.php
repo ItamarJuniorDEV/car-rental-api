@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
+use App\Http\Resources\BrandResource;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class BrandController extends Controller
 {
@@ -23,7 +23,7 @@ class BrandController extends Controller
 
         return response()->json([
             'message' => 'Marcas listadas com sucesso!',
-            'data' => $brands->items(),
+            'data' => BrandResource::collection($brands->getCollection())->resolve(),
             'pagination' => [
                 'total' => $brands->total(),
                 'per_page' => $brands->perPage(),
@@ -33,87 +33,45 @@ class BrandController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Brand $brand): JsonResponse
     {
-        $brand = Brand::find($id);
-
-        if (! $brand) {
-            return response()->json(['message' => 'Marca não encontrada.'], 404);
-        }
-
         return response()->json([
             'message' => 'Marca encontrada com sucesso!',
-            'data' => $brand,
+            'data' => (new BrandResource($brand))->resolve(),
         ]);
     }
 
     public function store(StoreBrandRequest $request): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('create', Brand::class);
 
-        try {
-            $brand = Brand::create($request->validated());
+        $brand = Brand::create($request->validated());
 
-            return response()->json([
-                'message' => 'Marca criada com sucesso!',
-                'data' => $brand,
-            ], 201);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Marca criada com sucesso!',
+            'data' => (new BrandResource($brand))->resolve(),
+        ], 201);
     }
 
-    public function update(UpdateBrandRequest $request, int $id): JsonResponse
+    public function update(UpdateBrandRequest $request, Brand $brand): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('update', $brand);
 
-        $brand = Brand::find($id);
+        $brand->fill($request->validated());
+        $brand->save();
 
-        if (! $brand) {
-            return response()->json(['message' => 'Marca não encontrada.'], 404);
-        }
-
-        try {
-            $brand->fill($request->validated());
-            $brand->save();
-
-            return response()->json([
-                'message' => 'Marca atualizada com sucesso!',
-                'data' => $brand,
-            ]);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json([
+            'message' => 'Marca atualizada com sucesso!',
+            'data' => (new BrandResource($brand))->resolve(),
+        ]);
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Brand $brand): JsonResponse
     {
-        if (! auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Acesso negado.'], 403);
-        }
+        $this->authorize('delete', $brand);
 
-        $brand = Brand::find($id);
+        $brand->delete();
 
-        if (! $brand) {
-            return response()->json(['message' => 'Marca não encontrada.'], 404);
-        }
-
-        try {
-            $brand->delete();
-
-            return response()->json(['message' => 'Marca removida com sucesso!']);
-        } catch (Throwable $e) {
-            report($e);
-
-            return response()->json(['message' => 'Erro interno no servidor.'], 500);
-        }
+        return response()->json(['message' => 'Marca removida com sucesso!']);
     }
 }
