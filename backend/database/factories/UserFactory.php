@@ -26,4 +26,9 @@ class UserFactory extends Factory
     {
         return $this->state(['role' => 'admin']);
     }
+
+    public function operador()
+    {
+        return $this->state(['role' => 'operador']);
+    }
 }
