@@ -1,6 +1,12 @@
 # Car Rental App
 
 ![CI](https://github.com/ItamarJuniorDEV/car-rental-app/actions/workflows/ci.yml/badge.svg)
+![Security](https://img.shields.io/badge/security-headers%20%26%20rate%20limit-success)
+![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
+![Vue](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white)
+![Quasar](https://img.shields.io/badge/Quasar-2-1976D2?logo=quasar&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 API REST e interface web para gerenciamento de locadora de veículos.
 
@@ -184,11 +190,11 @@ erDiagram
 
 **Backend**
 
-- PHP 8.4 + Laravel 12
+- PHP 8.3 + Laravel 12
 - Laravel Sanctum — autenticação por Bearer token
-- PostgreSQL 16
-- PHPUnit com SQLite in-memory para testes
-- PHPStan nível 5, Laravel Pint
+- Dedoc Scramble — documentação OpenAPI a partir do código
+- PostgreSQL 16 em produção, SQLite in-memory para testes
+- PHPUnit 11, Laravel Pint
 
 **Frontend**
 

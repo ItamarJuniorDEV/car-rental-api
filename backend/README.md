@@ -1,8 +1,11 @@
 # Locadora API
 
 ![CI](https://github.com/ItamarJuniorDEV/car-rental-app/actions/workflows/ci.yml/badge.svg)
+![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-API REST para gerenciamento de locadora de veículos. Desenvolvida com Laravel 12 seguindo o padrão Repository com interfaces — os controllers dependem de contratos, não de implementações concretas, o que facilita trocar o mecanismo de acesso a dados sem tocar no controller.
+API REST para gerenciamento de locadora de veículos em Laravel 12. Cada recurso tem Policy dedicada para autorização, Form Request para validação e API Resource para serialização. A documentação OpenAPI é gerada automaticamente pelo Scramble a partir do código.
 
 A parte mais interessante foi modelar a locação: verificação de disponibilidade dentro de uma transação para evitar que dois operadores aluguem o mesmo carro ao mesmo tempo, e o cálculo de multa na devolução com base nos dias de atraso.
 
@@ -10,11 +13,11 @@ A parte mais interessante foi modelar a locação: verificação de disponibilid
 
 ## Tecnologias
 
-- PHP 8.4 + Laravel 12
+- PHP 8.3 + Laravel 12
 - Laravel Sanctum (autenticação por Bearer token)
-- PostgreSQL 16
-- PHPUnit com SQLite in-memory nos testes
-- PHPStan nível 5
+- Dedoc Scramble (OpenAPI gerado a partir do código)
+- PostgreSQL 16 em produção, SQLite in-memory nos testes
+- PHPUnit 11
 - Laravel Pint
 
 ---
@@ -25,22 +28,23 @@ A parte mais interessante foi modelar a locação: verificação de disponibilid
 backend/
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/    # Recebe requisição, delega para o repositório
-│   │   ├── Requests/       # Validação de entrada
+│   │   ├── Controllers/    # Camada HTTP, fina
+│   │   ├── Requests/       # Validação de entrada (Form Request)
 │   │   ├── Resources/      # Formatação da resposta JSON
-│   │   └── Middleware/
+│   │   ├── Middleware/     # SecurityHeaders, throttle
+│   │   └── Resources/
 │   ├── Models/
-│   ├── Repositories/
-│   │   ├── Contracts/      # Interfaces
-│   │   └── Eloquent/       # Implementações
-│   ├── Policies/
-│   └── Exceptions/
+│   ├── Policies/           # Autorização por recurso
+│   ├── Services/           # Regra de negócio (RentalService)
+│   └── Providers/
+├── config/
 ├── database/
 │   ├── migrations/
 │   ├── factories/
 │   └── seeders/
 └── tests/
-    └── Feature/
+    ├── Feature/
+    └── Unit/
 ```
 
 ---
@@ -435,7 +439,8 @@ Cobertura: autenticação (register, login, logout, 401), CRUD de marcas com res
 | `php artisan migrate --seed` | Roda migrations e popula o banco |
 | `php artisan migrate:fresh --seed` | Recria o banco do zero com seed |
 | `./vendor/bin/pint` | Formata o código (PSR-12) |
-| `./vendor/bin/phpstan analyse` | Análise estática nível 5 |
+
+A documentação OpenAPI fica em `/docs/api` quando a aplicação está rodando.
 
 ---
 
