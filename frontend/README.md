@@ -1,5 +1,10 @@
 # Locadora Frontend
 
+![Vue](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js&logoColor=white)
+![Quasar](https://img.shields.io/badge/Quasar-2-1976D2?logo=quasar&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 Interface web do sistema de locadora de veículos. Consome a API REST do backend Laravel via Axios com autenticação por Bearer token.
 
 O ponto mais relevante da implementação foi o controle de acesso em duas camadas: o guard do Vue Router bloqueia a navegação para rotas restritas antes de renderizar a página, e a sidebar omite os itens de menu baseando-se no papel armazenado na store — evitando que o operador sequer veja as opções de administração.
