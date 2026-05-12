@@ -38,7 +38,6 @@ class UserTest extends TestCase
         $response->assertForbidden();
     }
 
-
     public function test_admin_pode_promover_usuario_para_admin()
     {
         $response = $this->actingAs($this->admin, 'sanctum')

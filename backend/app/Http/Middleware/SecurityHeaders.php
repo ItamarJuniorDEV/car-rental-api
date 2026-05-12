@@ -19,7 +19,7 @@ class SecurityHeaders
             'Permissions-Policy',
             'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
         );
-        $response->headers->set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'");
+        $response->headers->set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
 
         if (app()->isProduction() && $request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

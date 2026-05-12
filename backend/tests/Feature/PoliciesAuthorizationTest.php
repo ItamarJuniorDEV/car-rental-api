@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Brand;
 use App\Models\Car;
 use App\Models\Line;
 use App\Models\User;

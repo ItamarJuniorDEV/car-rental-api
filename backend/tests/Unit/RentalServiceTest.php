@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Rental;
 use App\Services\RentalService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class RentalServiceTest extends TestCase
@@ -65,7 +66,7 @@ class RentalServiceTest extends TestCase
         $car = Car::factory()->create(['available' => false]);
         $client = Client::factory()->create();
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(RentalService::class)->create([
             'client_id' => $client->id,

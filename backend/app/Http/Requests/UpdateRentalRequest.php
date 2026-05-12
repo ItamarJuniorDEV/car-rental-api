@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Rental;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateRentalRequest extends FormRequest
 {
@@ -27,9 +28,9 @@ class UpdateRentalRequest extends FormRequest
         ];
     }
 
-    public function withValidator(\Illuminate\Validation\Validator $validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function (\Illuminate\Validation\Validator $validator) {
+        $validator->after(function (Validator $validator) {
             $rental = $this->route('rental');
 
             if (! ($rental instanceof Rental)) {

@@ -98,5 +98,4 @@ class ClientTest extends TestCase
 
         $response->assertStatus(404);
     }
-
 }
