@@ -16,8 +16,6 @@ class CarResource extends JsonResource
             'available' => $this->available,
             'km' => $this->km,
             'line' => new LineResource($this->whenLoaded('line')),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

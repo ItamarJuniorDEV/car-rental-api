@@ -23,8 +23,8 @@ class RentalResource extends JsonResource
             'final_km' => $this->final_km,
             'late_fee' => $fees['late_fee'],
             'total' => $fees['total'],
-            'client' => $this->client,
-            'car' => $this->car,
+            'client' => new ClientResource($this->whenLoaded('client')),
+            'car' => new CarResource($this->whenLoaded('car')),
         ];
     }
 }

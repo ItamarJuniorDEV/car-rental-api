@@ -19,8 +19,6 @@ class LineResource extends JsonResource
             'air_bag' => $this->air_bag,
             'abs' => $this->abs,
             'brand' => new BrandResource($this->whenLoaded('brand')),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }
