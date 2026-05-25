@@ -45,7 +45,7 @@ class RentalService
         $rental->delete();
     }
 
-    public function calcularTaxas(Rental $rental): array
+    public function calculateFees(Rental $rental): array
     {
         $days = max(1, ceil($rental->period_start_date->diffInHours($rental->period_expected_end_date) / 24));
         $total = $days * $rental->daily_rate;
@@ -58,25 +58,5 @@ class RentalService
         }
 
         return ['late_fee' => $lateFee, 'total' => $total];
-    }
-
-    public function format(Rental $rental): array
-    {
-        $rental->loadMissing(['client', 'car']);
-        $fees = $this->calcularTaxas($rental);
-
-        return [
-            'id' => $rental->id,
-            'period_start_date' => $rental->period_start_date->format('Y-m-d H:i:s'),
-            'period_expected_end_date' => $rental->period_expected_end_date->format('Y-m-d H:i:s'),
-            'period_actual_end_date' => $rental->period_actual_end_date?->format('Y-m-d H:i:s'),
-            'daily_rate' => $rental->daily_rate,
-            'initial_km' => $rental->initial_km,
-            'final_km' => $rental->final_km,
-            'late_fee' => $fees['late_fee'],
-            'total' => $fees['total'],
-            'client' => $rental->client,
-            'car' => $rental->car,
-        ];
     }
 }

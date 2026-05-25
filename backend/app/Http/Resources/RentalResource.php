@@ -11,7 +11,7 @@ class RentalResource extends JsonResource
     public function toArray(Request $request): array
     {
         $this->resource->loadMissing(['client', 'car']);
-        $fees = app(RentalService::class)->calcularTaxas($this->resource);
+        $fees = app(RentalService::class)->calculateFees($this->resource);
 
         return [
             'id' => $this->id,
