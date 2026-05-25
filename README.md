@@ -23,7 +23,7 @@ Desenvolvi esse projeto a partir de uma conversa com o dono de uma locadora pequ
 - Controle de acesso por papel (admin / operador)
 - Gerenciamento de usuários pelo painel (criar, promover, revogar papel)
 - Soft delete em todas as entidades — histórico preservado
-- 60 testes automatizados no backend, 42 no frontend
+- 81 testes automatizados no backend, 42 no frontend
 
 ---
 
@@ -211,7 +211,7 @@ erDiagram
 
 ## Instalação
 
-**Pré-requisitos:** PHP 8.4+, Composer, Node 20+, PostgreSQL 16
+**Pré-requisitos:** PHP 8.3+, Composer, Node 20+, PostgreSQL 16
 
 Crie o banco de dados:
 
