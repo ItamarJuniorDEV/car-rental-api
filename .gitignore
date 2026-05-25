@@ -16,10 +16,6 @@ frontend/public/icons/
 .DS_Store
 .thumbs.db
 .env
-.claude/
-**/.claude/
-CLAUDE.md
-**/CLAUDE.md
 backend/scripts/
 .phpunit.result.cache
 vendor/
