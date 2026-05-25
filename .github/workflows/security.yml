@@ -21,17 +21,6 @@ jobs:
       - run: composer audit --no-interaction
         working-directory: backend
 
-  npm-audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm audit --audit-level=high
-        working-directory: frontend
-        continue-on-error: true
-
   gitleaks:
     runs-on: ubuntu-latest
     steps:

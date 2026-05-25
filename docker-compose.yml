@@ -36,14 +36,5 @@ services:
     expose:
       - "9000"
 
-  frontend:
-    build: ./frontend
-    container_name: locadora-frontend
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "9000:80"
-
 volumes:
   postgres_data:
