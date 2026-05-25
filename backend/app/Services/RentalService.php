@@ -45,7 +45,7 @@ class RentalService
         $rental->delete();
     }
 
-    public function calcularTaxas(Rental $rental): array
+    public function calculateFees(Rental $rental): array
     {
         $days = max(1, ceil($rental->period_start_date->diffInHours($rental->period_expected_end_date) / 24));
         $total = $days * $rental->daily_rate;

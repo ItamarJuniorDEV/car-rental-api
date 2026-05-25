@@ -23,7 +23,7 @@ class RentalServiceTest extends TestCase
             'daily_rate' => 200,
         ]);
 
-        $taxas = app(RentalService::class)->calcularTaxas($rental);
+        $taxas = app(RentalService::class)->calculateFees($rental);
 
         $this->assertSame(0.0, (float) $taxas['late_fee']);
         $this->assertSame(600.0, (float) $taxas['total']);
@@ -38,7 +38,7 @@ class RentalServiceTest extends TestCase
             'daily_rate' => 100,
         ]);
 
-        $taxas = app(RentalService::class)->calcularTaxas($rental);
+        $taxas = app(RentalService::class)->calculateFees($rental);
 
         $this->assertSame(100.0, (float) $taxas['late_fee']);
         $this->assertSame(300.0, (float) $taxas['total']);
