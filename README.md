@@ -74,8 +74,8 @@ Principais variáveis do `backend/.env`:
 |----------|-----------|--------|
 | `APP_ENV` | Ambiente | `local` |
 | `DB_CONNECTION` | Driver do banco | `pgsql` |
-| `DB_*` | Credenciais do PostgreSQL | — |
-| `CORS_ALLOWED_ORIGINS` | Origens liberadas no CORS | — |
+| `DB_*` | Credenciais do PostgreSQL | (obrigatória) |
+| `CORS_ALLOWED_ORIGINS` | Origens liberadas no CORS | (obrigatória) |
 
 ## Modelo de dados
 
