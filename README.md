@@ -2,7 +2,7 @@
 
 > API REST em Laravel 12 para gestão de locadora de veículos: frota, clientes, locações com cálculo de multa e controle de acesso por papel.
 
-![CI](https://github.com/ItamarJuniorDEV/car-rental/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/ItamarJuniorDEV/car-rental-api/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Índice
