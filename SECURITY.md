@@ -25,7 +25,7 @@ Não é um sistema crítico, mas algumas decisões valem comentar:
 - Validação centralizada em Form Requests com `authorize()` real chamando Policy.
 - `$fillable` explícito em todo modelo. Sem `$guarded = []`.
 - `Model::preventLazyLoading` em ambiente não-produção pra flagrar N+1 cedo.
-- Soft delete em todas as entidades — exclusão preserva histórico.
+- Soft delete em todas as entidades, exclusão preserva histórico.
 
 ## O que ainda não está coberto
 
@@ -35,4 +35,4 @@ Não é um sistema crítico, mas algumas decisões valem comentar:
 - Sem expiração de token Sanctum (Sanctum::expiration null).
 - Logs sensíveis: o handler global do Laravel pode acabar logando payload em caso de exception.
 
-Se for usar isso em produção de verdade, abre uma issue antes — várias dessas decisões mudariam.
+Se for usar isso em produção de verdade, abre uma issue antes; várias dessas decisões mudariam.
