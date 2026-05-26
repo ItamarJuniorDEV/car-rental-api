@@ -1,202 +1,155 @@
-# Car Rental App
+# Car Rental API
+
+> API REST em Laravel 12 para gestão de locadora de veículos: frota, clientes, locações com cálculo de multa e controle de acesso por papel.
 
 ![CI](https://github.com/ItamarJuniorDEV/car-rental/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-API REST e interface web para gerenciamento de locadora de veículos.
+## Índice
 
-Desenvolvi esse projeto a partir de uma conversa com o dono de uma locadora pequena que controlava tudo em planilhas do Excel: qual carro estava disponível, quem tinha alugado, quilometragem de saída e retorno. O sistema nunca chegou a ser implantado, mas serviu de base pra eu estruturar uma aplicação com as preocupações que aparecem em projetos reais: race condition no momento do aluguel, cálculo de multa na devolução, controle de acesso por papel em ambas as camadas e soft delete pra preservar histórico sem perder os dados.
+- [Sobre](#sobre)
+- [Funcionalidades](#funcionalidades)
+- [Stack](#stack)
+- [Como rodar](#como-rodar)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Modelo de dados](#modelo-de-dados)
+- [Documentação da API](#documentação-da-api)
+- [Testes](#testes)
+- [Decisões técnicas](#decisões-técnicas)
+- [Licença](#licença)
 
----
+## Sobre
+
+Desenvolvi esse projeto a partir de uma conversa com o dono de uma locadora pequena que controlava tudo em planilhas do Excel: qual carro estava disponível, quem tinha alugado, quilometragem de saída e retorno. O sistema nunca chegou a ser implantado, mas serviu de base pra eu estruturar uma API com as preocupações que aparecem em projetos reais: race condition no momento do aluguel, cálculo de multa na devolução, controle de acesso por papel e soft delete pra preservar o histórico.
 
 ## Funcionalidades
 
-- Cadastro de marcas, linhas e veículos com filtros e busca
+- Cadastro de marcas, linhas e veículos com filtro e paginação
 - Cadastro de clientes com validação de CPF
 - Criação de locação com verificação de disponibilidade em transação atômica
 - Registro de devolução com cálculo automático de multa por atraso
 - Controle de acesso por papel (admin / operador)
-- Gerenciamento de usuários pelo painel (criar, promover, revogar papel)
-- Soft delete em todas as entidades, histórico preservado
-- 81 testes automatizados no backend, 42 no frontend
+- Gerenciamento de usuários (criar, promover, revogar papel)
+- Soft delete em todas as entidades
 
----
+## Stack
 
-## Telas
+| Camada | Tecnologia |
+|--------|------------|
+| Linguagem | PHP 8.3 |
+| Framework | Laravel 12 |
+| Autenticação | Laravel Sanctum (Bearer token) |
+| Banco | PostgreSQL 16 (SQLite in-memory nos testes) |
+| Documentação | Dedoc Scramble (OpenAPI a partir do código) |
+| Testes | PHPUnit 11 |
+| Estilo | Laravel Pint |
+| Infra | Docker, GitHub Actions |
 
-**Dashboard**: locações ativas em destaque com alerta visual para devolução em atraso
+## Como rodar
 
-![Dashboard](images/img-dashboard.png)
-
-**Locações**: criação de locação, registro de devolução e cálculo de multa
-
-![Locações](images/img-locacoes.png)
-
-**Clientes**
-
-![Clientes](images/img-clientes.png)
-
-**Veículos**
-
-![Veículos](images/img-veiculos.png)
-
-**Marcas**
-
-![Marcas](images/img-marcas.png)
-
-**Linhas**
-
-![Linhas](images/img-linhas.png)
-
-**Usuários**: admin pode criar usuários, promover e revogar papel; não pode alterar o próprio papel
-
-![Usuários](images/img-usuarios.png)
-
----
-
-## Arquitetura
-
-Monorepo com backend e frontend servidos de forma independente.
-
-```
-car-rental/
-├── backend/    # API Laravel 12 (porta 8001)
-└── frontend/   # Interface Quasar v2 + Vue 3 (porta 9000)
-```
-
-O frontend (SPA) consome a API por HTTP/JSON usando token Bearer do Sanctum. Cada requisição passa pelas rotas com `auth:sanctum`, chega ao controller e persiste via Eloquent no PostgreSQL.
-
----
-
-## Modelo de Dados
-
-Hierarquia de cadastro: cada marca tem várias linhas, cada linha tem vários carros, e cada carro pode ter várias locações.
-
-- **Brand** (marca) tem muitas **Line** (linhas)
-- **Line** tem muitos **Car** (carros)
-- **Car** tem muitas **Rental** (locações)
-- **Client** (cliente) tem muitas **Rental**
-- **User** (usuário) com papel `admin` ou `operador`
-- **Rental** guarda o período (início, previsto e devolução real), a diária e a quilometragem inicial e final
-- `deleted_at` (soft delete) em brands, lines, cars, clients e rentals
-
----
-
-## Tecnologias
-
-**Backend**
-
-- PHP 8.3 + Laravel 12
-- Laravel Sanctum (autenticação por Bearer token)
-- Dedoc Scramble (documentação OpenAPI a partir do código)
-- PostgreSQL 16 em produção, SQLite in-memory para testes
-- PHPUnit 11, Laravel Pint
-
-**Frontend**
-
-- Vue 3 + Quasar v2 (Composition API, `<script setup>`)
-- Pinia (estado global com persistência em localStorage)
-- Axios com interceptors (injeção de token e redirecionamento automático em 401)
-- Vitest + @vue/test-utils
-
-**CI**
-
-- GitHub Actions: Pint, PHPStan e testes a cada push em `master`
-
----
-
-## Instalação
-
-**Pré-requisitos:** PHP 8.3+, Composer, Node 20+, PostgreSQL 16
-
-Crie o banco de dados:
-
-```bash
-createdb locadora
-```
-
-**Backend:**
+Pré-requisitos: PHP 8.3+, Composer, PostgreSQL 16 (ou Docker).
 
 ```bash
 cd backend
 composer install
 cp .env.example .env
-# edite DB_PASSWORD no .env
 php artisan key:generate
 php artisan migrate --seed
+php artisan serve --port=8001
 ```
 
-**Frontend:**
+API em `http://localhost:8001/api`. Login padrão do seeder: `admin@locadora.com` / `senha123`.
+
+Com Docker (`docker-compose.yml` sobe PostgreSQL 16 + backend):
 
 ```bash
-cd frontend
-npm install
+docker compose up -d
 ```
 
-Crie `frontend/.env`:
+## Variáveis de ambiente
 
-```env
-API_URL=http://localhost:8001/api
+Principais variáveis do `backend/.env`:
+
+| Variável | Descrição | Padrão |
+|----------|-----------|--------|
+| `APP_ENV` | Ambiente | `local` |
+| `DB_CONNECTION` | Driver do banco | `pgsql` |
+| `DB_*` | Credenciais do PostgreSQL | — |
+| `CORS_ALLOWED_ORIGINS` | Origens liberadas no CORS | — |
+
+## Modelo de dados
+
+Hierarquia de cadastro: cada marca tem várias linhas, cada linha tem vários carros, e cada carro pode ter várias locações.
+
+- `brands` tem muitas `lines`
+- `lines` tem muitos `cars`
+- `cars` tem muitas `rentals`
+- `clients` tem muitas `rentals`
+- `users` com papel `admin` ou `operador`
+- `rentals` guarda período (início, previsto e devolução real), diária e quilometragem inicial e final
+- `deleted_at` (soft delete) em brands, lines, cars, clients e rentals
+
+## Documentação da API
+
+Todas as rotas exigem `Authorization: Bearer <token>`, exceto registro e login.
+
+| Método | Rota | Acesso | Descrição |
+|--------|------|--------|-----------|
+| POST | `/api/register` | público | Cadastra usuário (papel `operador`) |
+| POST | `/api/login` | público | Autentica e retorna token |
+| POST | `/api/logout` | autenticado | Revoga o token atual |
+| GET | `/api/me` | autenticado | Dados do usuário autenticado |
+| GET | `/api/brands` `/api/lines` `/api/cars` | autenticado | Lista (paginado, com filtro) |
+| POST/PUT/DELETE | `/api/brands` `/api/lines` `/api/cars` | admin | Gerencia frota |
+| GET/POST/PUT/DELETE | `/api/clients` `/api/rentals` | operador / admin | CRUD de clientes e locações |
+| GET/POST | `/api/users` | admin | Lista e cria usuários |
+| PATCH | `/api/users/{id}/role` | admin | Promove ou revoga papel |
+
+Documentação interativa (Scramble) disponível em `/docs/api`.
+
+### Formato de resposta
+
+Sucesso:
+
+```json
+{
+  "message": "Marca encontrada com sucesso!",
+  "data": { "id": 1, "name": "Toyota" }
+}
 ```
 
----
+Listagem paginada inclui o bloco `pagination` (`total`, `per_page`, `current_page`, `last_page`).
 
-## Rodando
+Erro de validação (422):
 
-**Terminal 1:**
-
-```bash
-cd backend && php artisan serve --port=8001
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": { "name": ["O campo name é obrigatório."] }
+}
 ```
-
-**Terminal 2:**
-
-```bash
-cd frontend && npm run dev
-```
-
-Acesse `http://localhost:9000`
-
-Login padrão: `admin@locadora.com` / `senha123`
-
----
 
 ## Testes
 
 ```bash
-# backend (SQLite in-memory, não precisa do PostgreSQL configurado)
 cd backend && php artisan test
-
-# frontend
-cd frontend && npm test
 ```
 
----
+81 testes de feature e unidade, em SQLite in-memory (não precisa do PostgreSQL configurado). Cobrem CRUD, regras de negócio, autorização por papel, cabeçalhos de segurança, rate limiting e prevenção de IDOR.
 
-## Controle de Acesso
+## Decisões técnicas
 
-| Papel | Permissões |
-|-------|------------|
-| `admin` | Acesso total: marcas, linhas, veículos, clientes, locações e gerenciamento de usuários |
-| `operador` | Clientes e locações. Sem acesso ao cadastro de frota nem à gestão de usuários |
+- **Transação com lock pessimista na criação da locação.** Dois operadores podem tentar alugar o mesmo carro ao mesmo tempo. A disponibilidade é checada dentro de `DB::transaction` com `lockForUpdate()` no carro, evitando double-booking.
 
-O papel padrão ao registrar via `/api/register` é `operador`. Novos usuários com papel específico só podem ser criados por um admin via painel ou `POST /api/users`.
+- **Login em tempo constante.** O `login` roda dentro de um `Timebox` e compara a senha contra um hash placeholder quando o e-mail não existe, mantendo o tempo de resposta constante. Some-se a isso a mensagem de erro uniforme ("Credenciais inválidas") para não revelar se um e-mail está cadastrado (anti timing attack e anti enumeração de usuários).
 
-Um admin não pode alterar o próprio papel. A proteção está no backend e é refletida na interface (o botão de ação não aparece para o próprio usuário autenticado).
+- **Autorização por Policy.** Cada model tem sua Policy; o `authorize()` no controller garante que operador e admin só fazem o que o papel permite, inclusive bloqueando acesso direto por URL.
 
----
+- **Throttle separado.** `throttle:login` mais apertado no registro e login (anti brute-force) e `throttle:api` no restante.
 
-## Regras de Negócio
+- **Soft delete.** Marcas, carros, clientes e locações usam `deleted_at`, preservando o histórico em vez de apagar fisicamente.
 
-- Carro indisponível retorna 422 ao tentar criar locação
-- Disponibilidade verificada dentro de uma transação para evitar race condition
-- `final_km` menor que `initial_km` retorna 422
-- Data de devolução anterior à data de início retorna 422
-- Deletar carro ou cliente com locação em aberto retorna 422
-- Multa por atraso: `dias_de_atraso x diária x 0.5`
-- Todas as entidades usam soft delete, nada é removido fisicamente do banco
-
----
+- **Multa por atraso** calculada como `dias_de_atraso x diária x 0.5`, isolada no `RentalService`.
 
 ## Licença
 
