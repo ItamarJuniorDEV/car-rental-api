@@ -141,6 +141,50 @@ class RentalTest extends TestCase
         $this->assertEquals(200, $data['late_fee']);
     }
 
+    public function test_locacao_finalizada_nao_pode_ser_finalizada_novamente()
+    {
+        $rental = $this->criarLocacao();
+
+        $this->actingAs($this->operador, 'sanctum')
+            ->putJson("/api/rentals/{$rental->id}", [
+                'period_actual_end_date' => '2026-03-05 08:00:00',
+                'final_km' => 15800,
+            ])
+            ->assertOk();
+
+        $this->actingAs($this->operador, 'sanctum')
+            ->putJson("/api/rentals/{$rental->id}", [
+                'period_actual_end_date' => '2026-03-06 08:00:00',
+                'final_km' => 16000,
+            ])
+            ->assertStatus(422);
+
+        $this->assertEquals(15800, $this->car->fresh()->km);
+        $this->assertEquals('2026-03-05 08:00:00', $rental->fresh()->period_actual_end_date->format('Y-m-d H:i:s'));
+    }
+
+    public function test_remover_locacao_historica_nao_libera_carro_com_locacao_ativa()
+    {
+        $historicalRental = $this->criarLocacao();
+
+        $this->actingAs($this->operador, 'sanctum')
+            ->putJson("/api/rentals/{$historicalRental->id}", [
+                'period_actual_end_date' => '2026-03-05 08:00:00',
+                'final_km' => 15800,
+            ])
+            ->assertOk();
+
+        $activeRental = $this->criarLocacao();
+        $this->assertFalse($this->car->fresh()->available);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->deleteJson("/api/rentals/{$historicalRental->id}")
+            ->assertOk();
+
+        $this->assertNotNull($activeRental->fresh());
+        $this->assertFalse($this->car->fresh()->available);
+    }
+
     public function test_nao_pode_deletar_carro_com_locacao_ativa()
     {
         $this->criarLocacao();
