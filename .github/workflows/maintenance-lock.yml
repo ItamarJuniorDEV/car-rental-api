@@ -34,3 +34,5 @@ jobs:
             git commit -m "chore: atualizar dependencias do backend"
             git push origin HEAD:fix/rental-maintenance-recovery
           fi
+
+# Workflow temporário usado apenas para regenerar o lockfile durante esta manutenção.
