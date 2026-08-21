@@ -2,7 +2,6 @@
 .github
 .idea
 .vscode
-.claude
 .editorconfig
 .env
 .env.*
@@ -23,4 +22,3 @@ Dockerfile
 .dockerignore
 *.md
 scripts
-CLAUDE.md
