@@ -29,20 +29,45 @@ class RentalService
 
     public function update(Rental $rental, array $data): Rental
     {
-        $rental->fill($data);
-        $rental->save();
+        return DB::transaction(function () use ($rental, $data) {
+            $lockedRental = Rental::query()->lockForUpdate()->findOrFail($rental->id);
+            $car = Car::query()->lockForUpdate()->findOrFail($lockedRental->car_id);
 
-        if (isset($data['period_actual_end_date'])) {
-            $rental->car()->update(['available' => true, 'km' => $data['final_km']]);
-        }
+            if (isset($data['period_actual_end_date']) && $lockedRental->period_actual_end_date !== null) {
+                throw ValidationException::withMessages([
+                    'period_actual_end_date' => ['A locação já foi finalizada.'],
+                ]);
+            }
 
-        return $rental->fresh(['client', 'car']);
+            $lockedRental->fill($data);
+            $lockedRental->save();
+
+            if (isset($data['period_actual_end_date'])) {
+                $car->update([
+                    'available' => true,
+                    'km' => $data['final_km'],
+                ]);
+            }
+
+            return $lockedRental->fresh(['client', 'car']);
+        });
     }
 
     public function delete(Rental $rental): void
     {
-        $rental->car()->update(['available' => true]);
-        $rental->delete();
+        DB::transaction(function () use ($rental) {
+            $lockedRental = Rental::query()->lockForUpdate()->findOrFail($rental->id);
+            $car = Car::query()->lockForUpdate()->findOrFail($lockedRental->car_id);
+
+            $lockedRental->delete();
+
+            $hasActiveRental = Rental::query()
+                ->where('car_id', $car->id)
+                ->whereNull('period_actual_end_date')
+                ->exists();
+
+            $car->update(['available' => ! $hasActiveRental]);
+        });
     }
 
     public function calculateFees(Rental $rental): array
