@@ -1,56 +1,39 @@
 # Car Rental API
 
-> API REST em Laravel 12 para gestão de locadora de veículos: frota, clientes, locações com cálculo de multa e controle de acesso por papel.
+> API REST para gestão de locadora de veículos, com controle de frota, clientes, locações, devoluções e permissões por papel.
 
 ![CI](https://github.com/ItamarJuniorDEV/car-rental-api/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## Índice
-
-- [Sobre](#sobre)
-- [Funcionalidades](#funcionalidades)
-- [Stack](#stack)
-- [Como rodar](#como-rodar)
-- [Variáveis de ambiente](#variáveis-de-ambiente)
-- [Modelo de dados](#modelo-de-dados)
-- [Documentação da API](#documentação-da-api)
-- [Testes](#testes)
-- [Decisões técnicas](#decisões-técnicas)
-- [Licença](#licença)
-
-## Sobre
-
-Desenvolvi esse projeto a partir de uma conversa com o dono de uma locadora pequena que controlava tudo em planilhas do Excel: qual carro estava disponível, quem tinha alugado, quilometragem de saída e retorno. O sistema nunca chegou a ser implantado, mas serviu de base pra eu estruturar uma API com as preocupações que aparecem em projetos reais: race condition no momento do aluguel, cálculo de multa na devolução, controle de acesso por papel e soft delete pra preservar o histórico.
-
 ## Funcionalidades
 
-- Cadastro de marcas, linhas e veículos com filtro e paginação
-- Cadastro de clientes com validação de CPF
-- Criação de locação com verificação de disponibilidade em transação atômica
-- Registro de devolução com cálculo automático de multa por atraso
-- Controle de acesso por papel (admin / operador)
-- Gerenciamento de usuários (criar, promover, revogar papel)
-- Soft delete em todas as entidades
+- cadastro de marcas, linhas e veículos;
+- cadastro de clientes com validação de CPF;
+- criação de locações com verificação de disponibilidade;
+- devolução com atualização de quilometragem e cálculo de multa por atraso;
+- controle de acesso para administradores e operadores;
+- gerenciamento de usuários;
+- preservação de histórico com soft delete.
 
 ## Stack
 
 | Camada | Tecnologia |
-|--------|------------|
-| Linguagem | PHP 8.3 |
-| Framework | Laravel 12 |
-| Autenticação | Laravel Sanctum (Bearer token) |
-| Banco | PostgreSQL 16 (SQLite in-memory nos testes) |
-| Documentação | Dedoc Scramble (OpenAPI a partir do código) |
-| Testes | PHPUnit 11 |
-| Estilo | Laravel Pint |
+|---|---|
+| Backend | PHP 8.3, Laravel 12 |
+| Autenticação | Laravel Sanctum |
+| Banco | PostgreSQL 16 |
+| Documentação | Dedoc Scramble / OpenAPI |
+| Testes | PHPUnit 11, SQLite in-memory |
+| Qualidade | Laravel Pint, Larastan |
 | Infra | Docker, GitHub Actions |
 
 ## Como rodar
 
-Pré-requisitos: PHP 8.3+, Composer, PostgreSQL 16 (ou Docker).
+Pré-requisitos: PHP 8.3+, Composer e PostgreSQL.
 
 ```bash
-cd backend
+git clone https://github.com/ItamarJuniorDEV/car-rental-api.git
+cd car-rental-api/backend
 composer install
 cp .env.example .env
 php artisan key:generate
@@ -58,98 +41,45 @@ php artisan migrate --seed
 php artisan serve --port=8001
 ```
 
-API em `http://localhost:8001/api`. Login padrão do seeder: `admin@locadora.com` / `senha123`.
+A API fica disponível em `http://localhost:8001/api` e a documentação interativa em `http://localhost:8001/docs/api`.
 
-Com Docker (`docker-compose.yml` sobe PostgreSQL 16 + backend):
+O seeder cria um usuário administrativo para desenvolvimento:
 
-```bash
-docker compose up -d
+```text
+admin@locadora.com
+senha123
 ```
 
-## Variáveis de ambiente
+O `docker-compose.yml` inclui PostgreSQL 16 e o backend PHP-FPM para uso em ambiente containerizado.
 
-Principais variáveis do `backend/.env`:
+## Autenticação e autorização
 
-| Variável | Descrição | Padrão |
-|----------|-----------|--------|
-| `APP_ENV` | Ambiente | `local` |
-| `DB_CONNECTION` | Driver do banco | `pgsql` |
-| `DB_*` | Credenciais do PostgreSQL | (obrigatória) |
-| `CORS_ALLOWED_ORIGINS` | Origens liberadas no CORS | (obrigatória) |
+As rotas protegidas utilizam tokens Bearer do Laravel Sanctum. O acesso às operações é controlado por Policies e pelos papéis `admin` e `operador`.
 
-## Modelo de dados
+Registro e login são públicos. As demais rotas exigem autenticação conforme a permissão da operação.
 
-Hierarquia de cadastro: cada marca tem várias linhas, cada linha tem vários carros, e cada carro pode ter várias locações.
+## Integridade das locações
 
-- `brands` tem muitas `lines`
-- `lines` tem muitos `cars`
-- `cars` tem muitas `rentals`
-- `clients` tem muitas `rentals`
-- `users` com papel `admin` ou `operador`
-- `rentals` guarda período (início, previsto e devolução real), diária e quilometragem inicial e final
-- `deleted_at` (soft delete) em brands, lines, cars, clients e rentals
+A criação de uma locação bloqueia o registro do veículo com `lockForUpdate()` dentro de uma transação antes de alterar sua disponibilidade.
 
-## Documentação da API
+A devolução atualiza a locação e o estado do veículo na mesma transação. Uma locação já finalizada não pode ser finalizada novamente. Ao remover uma locação, a disponibilidade do veículo é recalculada considerando outras locações ativas.
 
-Todas as rotas exigem `Authorization: Bearer <token>`, exceto registro e login.
-
-| Método | Rota | Acesso | Descrição |
-|--------|------|--------|-----------|
-| POST | `/api/register` | público | Cadastra usuário (papel `operador`) |
-| POST | `/api/login` | público | Autentica e retorna token |
-| POST | `/api/logout` | autenticado | Revoga o token atual |
-| GET | `/api/me` | autenticado | Dados do usuário autenticado |
-| GET | `/api/brands` `/api/lines` `/api/cars` | autenticado | Lista (paginado, com filtro) |
-| POST/PUT/DELETE | `/api/brands` `/api/lines` `/api/cars` | admin | Gerencia frota |
-| GET/POST/PUT/DELETE | `/api/clients` `/api/rentals` | operador / admin | CRUD de clientes e locações |
-| GET/POST | `/api/users` | admin | Lista e cria usuários |
-| PATCH | `/api/users/{id}/role` | admin | Promove ou revoga papel |
-
-Documentação interativa (Scramble) disponível em `/docs/api`.
-
-### Formato de resposta
-
-Sucesso:
-
-```json
-{
-  "message": "Marca encontrada com sucesso!",
-  "data": { "id": 1, "name": "Toyota" }
-}
-```
-
-Listagem paginada inclui o bloco `pagination` (`total`, `per_page`, `current_page`, `last_page`).
-
-Erro de validação (422):
-
-```json
-{
-  "message": "The given data was invalid.",
-  "errors": { "name": ["O campo name é obrigatório."] }
-}
-```
+A multa por atraso é calculada no `RentalService` com base nos dias excedentes e no valor da diária.
 
 ## Testes
 
 ```bash
-cd backend && php artisan test
+cd backend
+php artisan test
 ```
 
-81 testes de feature e unidade, em SQLite in-memory (não precisa do PostgreSQL configurado). Cobrem CRUD, regras de negócio, autorização por papel, cabeçalhos de segurança, rate limiting e prevenção de IDOR.
+A suíte cobre autenticação, autorização, CRUDs principais, regras de locação, validações, rate limiting e cabeçalhos de segurança.
 
-## Decisões técnicas
+O pipeline de CI também executa o Laravel Pint antes dos testes.
 
-- **Transação com lock pessimista na criação da locação.** Dois operadores podem tentar alugar o mesmo carro ao mesmo tempo. A disponibilidade é checada dentro de `DB::transaction` com `lockForUpdate()` no carro, evitando double-booking.
+## Segurança
 
-- **Login em tempo constante.** O `login` roda dentro de um `Timebox` e compara a senha contra um hash placeholder quando o e-mail não existe, mantendo o tempo de resposta constante. Some-se a isso a mensagem de erro uniforme ("Credenciais inválidas") para não revelar se um e-mail está cadastrado (anti timing attack e anti enumeração de usuários).
-
-- **Autorização por Policy.** Cada model tem sua Policy; o `authorize()` no controller garante que operador e admin só fazem o que o papel permite, inclusive bloqueando acesso direto por URL.
-
-- **Throttle separado.** `throttle:login` mais apertado no registro e login (anti brute-force) e `throttle:api` no restante.
-
-- **Soft delete.** Marcas, carros, clientes e locações usam `deleted_at`, preservando o histórico em vez de apagar fisicamente.
-
-- **Multa por atraso** calculada como `dias_de_atraso x diária x 0.5`, isolada no `RentalService`.
+O repositório mantém workflows separados para testes e verificações de segurança. O fluxo de segurança executa auditoria das dependências do Composer e varredura de segredos com Gitleaks.
 
 ## Licença
 
