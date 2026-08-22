@@ -55,10 +55,29 @@ class RentalServiceTest extends TestCase
             'period_start_date' => now(),
             'period_expected_end_date' => now()->addDays(2),
             'daily_rate' => 150,
-            'initial_km' => 10000,
         ]);
 
         $this->assertFalse($car->fresh()->available);
+    }
+
+    public function test_create_usa_quilometragem_atual_do_carro(): void
+    {
+        $car = Car::factory()->create([
+            'available' => true,
+            'km' => 42350,
+        ]);
+        $client = Client::factory()->create();
+
+        $rental = app(RentalService::class)->create([
+            'client_id' => $client->id,
+            'car_id' => $car->id,
+            'period_start_date' => now(),
+            'period_expected_end_date' => now()->addDays(2),
+            'daily_rate' => 150,
+            'initial_km' => 1,
+        ]);
+
+        $this->assertSame(42350, $rental->initial_km);
     }
 
     public function test_create_rejeita_carro_indisponivel(): void
@@ -74,7 +93,6 @@ class RentalServiceTest extends TestCase
             'period_start_date' => now(),
             'period_expected_end_date' => now()->addDays(2),
             'daily_rate' => 150,
-            'initial_km' => 10000,
         ]);
     }
 }
