@@ -34,17 +34,32 @@ jobs:
           key: composer-${{ hashFiles('backend/composer.lock') }}
           restore-keys: composer-
 
-      - run: composer install --prefer-dist --no-progress --no-interaction
+      - name: Validate Composer files
         working-directory: backend
+        run: composer validate --strict
 
-      - run: cp .env.example .env
+      - name: Install dependencies
         working-directory: backend
+        run: composer install --prefer-dist --no-progress --no-interaction
 
-      - run: php artisan key:generate
+      - name: Prepare application
         working-directory: backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
 
-      - run: ./vendor/bin/pint --test
+      - name: Check code style
         working-directory: backend
+        run: composer format:test
 
-      - run: php artisan test
+      - name: Static analysis
         working-directory: backend
+        run: composer analyse
+
+      - name: Rector dry run
+        working-directory: backend
+        run: composer refactor:test
+
+      - name: Run tests
+        working-directory: backend
+        run: composer test
