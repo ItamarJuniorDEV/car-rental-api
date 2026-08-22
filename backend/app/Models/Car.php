@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\CarFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Car extends Model
 {
+    /** @use HasFactory<CarFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -23,11 +25,13 @@ class Car extends Model
         'available' => 'boolean',
     ];
 
+    /** @return BelongsTo<Line, $this> */
     public function line(): BelongsTo
     {
         return $this->belongsTo(Line::class);
     }
 
+    /** @return HasMany<Rental, $this> */
     public function rentals(): HasMany
     {
         return $this->hasMany(Rental::class);

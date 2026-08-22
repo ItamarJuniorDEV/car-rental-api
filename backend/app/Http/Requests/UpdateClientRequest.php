@@ -19,6 +19,7 @@ class UpdateClientRequest extends FormRequest
         return $client !== null && ($this->user()?->can('update', $client) ?? false);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

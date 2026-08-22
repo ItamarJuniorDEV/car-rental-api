@@ -20,6 +20,7 @@ class UpdateRentalRequest extends FormRequest
         return $rental !== null && ($this->user()?->can('update', $rental) ?? false);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [
@@ -30,7 +31,7 @@ class UpdateRentalRequest extends FormRequest
 
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function (Validator $validator) {
+        $validator->after(function (Validator $validator): void {
             $rental = $this->route('rental');
 
             if (! ($rental instanceof Rental)) {
