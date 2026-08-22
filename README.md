@@ -24,7 +24,7 @@
 | Banco | PostgreSQL 16 |
 | Documentação | Dedoc Scramble / OpenAPI |
 | Testes | PHPUnit 11, SQLite in-memory |
-| Qualidade | Laravel Pint, Larastan |
+| Qualidade | Laravel Pint, Larastan nível 6, Rector |
 | Infra | Docker, GitHub Actions |
 
 ## Como rodar
@@ -52,19 +52,38 @@ senha123
 
 O `docker-compose.yml` inclui PostgreSQL 16 e o backend PHP-FPM para uso em ambiente containerizado.
 
-## Autenticação e autorização
+## Arquitetura e decisões técnicas
 
-As rotas protegidas utilizam tokens Bearer do Laravel Sanctum. O acesso às operações é controlado por Policies e pelos papéis `admin` e `operador`.
+A aplicação usa os componentes nativos do Laravel diretamente nos fluxos simples de CRUD e concentra regras de negócio que exigem coordenação de estado no `RentalService`. Isso evita adicionar uma camada de repositório apenas para encapsular chamadas simples do Eloquent, mantendo a separação onde ela agrega valor ao domínio.
 
-Registro e login são públicos. As demais rotas exigem autenticação conforme a permissão da operação.
+As transições de estado de uma locação são executadas em transações. Na criação, o veículo é carregado com `lockForUpdate()` antes da checagem de disponibilidade, e a quilometragem inicial é obtida do próprio registro bloqueado no banco, não do payload do cliente.
+
+Na devolução, locação e veículo são bloqueados e atualizados na mesma transação. Uma locação finalizada não pode ser finalizada novamente. Ao remover uma locação, a disponibilidade do veículo é recalculada considerando outras locações ativas.
+
+Autenticação é feita com Sanctum e autorização com Policies. O ambiente de desenvolvimento também impede lazy loading para tornar consultas inesperadas mais visíveis durante a evolução do código.
+
+## Qualidade de código
+
+O projeto mantém os checks de qualidade como parte do pipeline, não apenas como ferramentas de uso local:
+
+- **Laravel Pint** para consistência de estilo;
+- **Larastan/PHPStan nível 6** para análise estática de controllers, models, relações, requests e regras de domínio;
+- **Rector em dry-run** para detectar oportunidades seguras de modernização sem aplicar refatorações automáticas no CI;
+- **PHPUnit** para regressão funcional e regras de negócio;
+- **Composer Audit** e **Gitleaks** no workflow de segurança.
+
+Para executar a mesma sequência localmente:
+
+```bash
+cd backend
+composer quality
+```
+
+O comando executa estilo, análise estática, Rector em modo de verificação e testes.
 
 ## Integridade das locações
 
-A criação de uma locação bloqueia o registro do veículo com `lockForUpdate()` dentro de uma transação antes de alterar sua disponibilidade.
-
-A devolução atualiza a locação e o estado do veículo na mesma transação. Uma locação já finalizada não pode ser finalizada novamente. Ao remover uma locação, a disponibilidade do veículo é recalculada considerando outras locações ativas.
-
-A multa por atraso é calculada no `RentalService` com base nos dias excedentes e no valor da diária.
+A multa por atraso é calculada no `RentalService` com base nos dias excedentes e no valor da diária. A integridade da disponibilidade do veículo é tratada junto das operações de locação para que mudanças relacionadas não sejam persistidas pela metade.
 
 ## Testes
 
@@ -75,11 +94,9 @@ php artisan test
 
 A suíte cobre autenticação, autorização, CRUDs principais, regras de locação, validações, rate limiting e cabeçalhos de segurança.
 
-O pipeline de CI também executa o Laravel Pint antes dos testes.
-
 ## Segurança
 
-O repositório mantém workflows separados para testes e verificações de segurança. O fluxo de segurança executa auditoria das dependências do Composer e varredura de segredos com Gitleaks.
+O repositório mantém workflows separados para CI e segurança. O pipeline principal valida `composer.json`, executa Pint, Larastan nível 6, Rector em dry-run e a suíte de testes. O fluxo de segurança executa auditoria das dependências do Composer e varredura de segredos com Gitleaks.
 
 ## Licença
 
