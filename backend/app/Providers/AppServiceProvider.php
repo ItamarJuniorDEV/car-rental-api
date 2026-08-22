@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
 
         Scramble::configure()
             ->routes(fn (Route $route) => str_starts_with($route->uri(), 'api/'))
-            ->withDocumentTransformers(function (OpenApi $openApi) {
+            ->withDocumentTransformers(function (OpenApi $openApi): void {
                 $openApi->secure(SecurityScheme::http('bearer'));
             });
 

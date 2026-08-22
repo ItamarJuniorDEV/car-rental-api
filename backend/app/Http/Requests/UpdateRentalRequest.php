@@ -31,7 +31,7 @@ class UpdateRentalRequest extends FormRequest
 
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function (Validator $validator) {
+        $validator->after(function (Validator $validator): void {
             $rental = $this->route('rental');
 
             if (! ($rental instanceof Rental)) {

@@ -59,7 +59,7 @@ class RentalService
 
     public function delete(Rental $rental): void
     {
-        DB::transaction(function () use ($rental) {
+        DB::transaction(function () use ($rental): void {
             $lockedRental = Rental::query()->lockForUpdate()->findOrFail($rental->id);
             $car = Car::query()->lockForUpdate()->findOrFail($lockedRental->car_id);
 
