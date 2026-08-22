@@ -12,11 +12,13 @@ class RentalService
     public function create(array $data): Rental
     {
         return DB::transaction(function () use ($data) {
-            $car = Car::lockForUpdate()->find($data['car_id']);
+            $car = Car::lockForUpdate()->findOrFail($data['car_id']);
 
             if (! $car->available) {
                 throw ValidationException::withMessages(['car_id' => ['O veículo não está disponível para locação.']]);
             }
+
+            $data['initial_km'] = $car->km;
 
             $rental = Rental::create($data);
 
