@@ -11,8 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Rental extends Model
 {
     /** @use HasFactory<RentalFactory> */
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'client_id',

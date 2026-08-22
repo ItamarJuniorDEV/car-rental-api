@@ -12,8 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Line extends Model
 {
     /** @use HasFactory<LineFactory> */
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'brand_id',

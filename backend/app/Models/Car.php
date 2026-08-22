@@ -12,8 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Car extends Model
 {
     /** @use HasFactory<CarFactory> */
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'line_id',
