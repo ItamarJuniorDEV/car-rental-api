@@ -12,6 +12,7 @@ class StoreCarRequest extends FormRequest
         return $this->user()?->can('create', Car::class) ?? false;
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

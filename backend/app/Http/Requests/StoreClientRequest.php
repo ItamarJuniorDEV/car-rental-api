@@ -12,6 +12,7 @@ class StoreClientRequest extends FormRequest
         return $this->user()?->can('create', Client::class) ?? false;
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

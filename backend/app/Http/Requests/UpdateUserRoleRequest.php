@@ -24,6 +24,7 @@ class UpdateUserRoleRequest extends FormRequest
         return $caller->can('updateRole', $target);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

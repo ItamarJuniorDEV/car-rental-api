@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class RentalService
 {
+    /** @param array<string, mixed> $data */
     public function create(array $data): Rental
     {
         return DB::transaction(function () use ($data) {
@@ -29,6 +30,7 @@ class RentalService
         });
     }
 
+    /** @param array<string, mixed> $data */
     public function update(Rental $rental, array $data): Rental
     {
         return DB::transaction(function () use ($rental, $data) {
@@ -72,6 +74,7 @@ class RentalService
         });
     }
 
+    /** @return array{late_fee: float|int, total: float|int} */
     public function calculateFees(Rental $rental): array
     {
         $days = max(1, ceil($rental->period_start_date->diffInHours($rental->period_expected_end_date) / 24));

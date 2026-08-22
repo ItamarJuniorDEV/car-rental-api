@@ -2,12 +2,15 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Rental;
 use App\Services\RentalService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin Rental */
 class RentalResource extends JsonResource
 {
+    /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
         $this->resource->loadMissing(['client', 'car']);

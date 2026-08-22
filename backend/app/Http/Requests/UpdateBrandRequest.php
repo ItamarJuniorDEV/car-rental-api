@@ -19,6 +19,7 @@ class UpdateBrandRequest extends FormRequest
         return $brand !== null && ($this->user()?->can('update', $brand) ?? false);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

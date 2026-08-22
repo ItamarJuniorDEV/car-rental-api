@@ -29,7 +29,9 @@ class AuthController extends Controller
         $token = (new Timebox)->call(function () use ($request) {
             $user = User::where('email', $request->input('email'))->first();
 
-            $hash = $user?->password ?? '$2y$12$placeholderplaceholderplaceholderplaceholderplaceholde';
+            $hash = $user !== null
+                ? $user->password
+                : '$2y$12$placeholderplaceholderplaceholderplaceholderplaceholde';
             $passwordOk = Hash::check($request->input('password'), $hash);
 
             if (! $user || ! $passwordOk) {

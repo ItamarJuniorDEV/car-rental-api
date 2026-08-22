@@ -18,6 +18,7 @@ class UpdateLineRequest extends FormRequest
         return $line !== null && ($this->user()?->can('update', $line) ?? false);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

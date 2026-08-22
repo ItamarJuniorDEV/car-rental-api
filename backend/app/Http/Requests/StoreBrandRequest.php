@@ -12,6 +12,7 @@ class StoreBrandRequest extends FormRequest
         return $this->user()?->can('create', Brand::class) ?? false;
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

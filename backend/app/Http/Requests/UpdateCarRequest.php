@@ -19,6 +19,7 @@ class UpdateCarRequest extends FormRequest
         return $car !== null && ($this->user()?->can('update', $car) ?? false);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

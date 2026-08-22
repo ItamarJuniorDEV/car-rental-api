@@ -12,6 +12,7 @@ class StoreLineRequest extends FormRequest
         return $this->user()?->can('create', Line::class) ?? false;
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [

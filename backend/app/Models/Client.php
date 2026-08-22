@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,10 +10,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Client extends Model
 {
-    use HasFactory, SoftDeletes;
+    /** @use HasFactory<ClientFactory> */
+    use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = ['name', 'cpf', 'email', 'phone'];
 
+    /** @return HasMany<Rental, $this> */
     public function rentals(): HasMany
     {
         return $this->hasMany(Rental::class);

@@ -20,6 +20,7 @@ class UpdateRentalRequest extends FormRequest
         return $rental !== null && ($this->user()?->can('update', $rental) ?? false);
     }
 
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [
