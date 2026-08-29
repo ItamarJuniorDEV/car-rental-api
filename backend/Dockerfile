@@ -4,7 +4,7 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --no-progress --no-scripts --prefer-dist --optimize-autoloader
 
-FROM php:8.3-fpm-alpine AS runtime
+FROM php:8.5-fpm-alpine AS runtime
 
 ARG APP_USER=app
 ARG APP_UID=1000
